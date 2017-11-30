@@ -211,7 +211,7 @@ diff -Naur minisat-2.2.0_or/core/Solver_C.cc minisat-2.2.0/core/Solver_C.cc
 +  return (MiniSat_ptr)new Minisat::Solver();
 +}
 +
-+extern "C"void MiniSat_Delete(MiniSat_ptr ms)
++extern "C" void MiniSat_Delete(MiniSat_ptr ms)
 +{
 +  delete (Minisat::Solver *)ms;
 +}
@@ -597,7 +597,7 @@ diff -Naur minisat-2.2.0_or/simp/Solver_C.cc minisat-2.2.0/simp/Solver_C.cc
 +  return (MiniSat_ptr) new Minisat::SimpSolver();
 +}
 +
-+extern "C"void MiniSat_Delete(MiniSat_ptr ms)
++extern "C" void MiniSat_Delete(MiniSat_ptr ms)
 +{
 +  delete (Minisat::SimpSolver *)ms;
 +}

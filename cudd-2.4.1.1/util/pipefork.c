@@ -43,7 +43,8 @@ int util_pipefork(char **argv,		/* normal argv argument list */
 #if (defined __hpux) || (defined __osf__) || (defined _IBMR2) || (defined __SVR4) || (defined __CYGWIN32__) || (defined __MINGW32__) 
     int status;
 #else
-    union wait status;
+    int status;
+    //union wait status;
 #endif
 
     /* create the PIPES...
