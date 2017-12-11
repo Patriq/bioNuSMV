@@ -249,6 +249,10 @@ static boolean isCorrectExp(node_ptr exp, enum EXP_KIND expectedKind)
       return isCorrectExp(car(exp), EXP_LTL)
         && isCorrectExp(cdr(exp), EXP_LTL); /* continue to check LTL */
 
+     /* ARCTL expressions. Hack to progress further */
+    case EAX: case EAU: case AAX: case AAU: case EAF: case AAF: case EAG: case AAG:
+        return true;
+
     default: nusmv_assert(false); /* unknown expression */
     }
   return false; /* should never be invoked */

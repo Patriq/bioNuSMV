@@ -139,7 +139,7 @@ static node_ptr node2maincontext(node_ptr node);
 %left <lineno> TOK_ABS TOK_MIN TOK_MAX
 
 %left  <lineno> TOK_COMMA TOK_IMPLIES TOK_IFF TOK_OR TOK_XOR TOK_XNOR TOK_AND TOK_NOT TOK_QUESTIONMARK
-%left  <lineno> TOK_EX TOK_AX TOK_EF TOK_AF TOK_EG TOK_AG TOK_EE TOK_AA
+%left  <lineno> TOK_EX TOK_AX TOK_EAX TOK_AAX TOK_EF TOK_AF TOK_EG TOK_AG TOK_EAF TOK_AAF TOK_EAG TOK_AAG TOK_EE TOK_AA TOK_EEA TOK_AAA
 %left  <lineno> TOK_SINCE TOK_UNTIL TOK_TRIGGERED TOK_RELEASES
 %left  <lineno> TOK_EBF TOK_EBG TOK_ABF TOK_ABG TOK_BUNTIL TOK_MMIN TOK_MMAX
 %left  <lineno> TOK_OP_NEXT TOK_OP_GLOBAL TOK_OP_FUTURE
@@ -185,6 +185,7 @@ static node_ptr node2maincontext(node_ptr node);
 %type <node> init invar trans
 %type <node> fairness justice compassion
 %type <node> invarspec ctlspec ltlspec pslspec compute
+%type <node> action_expr
 %type <node> _invarspec _ctlspec _ltlspec _compute
 %type <node> constants constants_expression
 %type <node> compute_expression

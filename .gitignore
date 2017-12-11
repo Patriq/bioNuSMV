@@ -1,0 +1,6 @@
+# Clion build folder
+cmake-build-debug/
+# Build folder
+NuSMV/build/
+# Clion config folder
+.idea

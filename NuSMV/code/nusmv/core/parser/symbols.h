@@ -225,7 +225,15 @@ enum NUSMV_CORE_SYMBOLS {
 
   NUSMV_CORE_SYMBOL_LAST,
 
-
+  /* ARCTL symbols */
+  EAX, /* 257*/
+  EAU,
+  AAX,
+  AAU,
+  EAF,
+  AAF,
+  EAG,
+  AAG,
 };
 
 

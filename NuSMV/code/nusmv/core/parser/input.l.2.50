@@ -59,11 +59,19 @@
 
 "EX"                    {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_EX);}
 "AX"                    {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_AX);}
+"EAX"                   {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_EAX);}
+"AAX"                   {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_AAX);}
 "EF"                    {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_EF);}
 "AF"                    {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_AF);}
 "EG"                    {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_EG);}
 "AG"                    {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_AG);}
 "E"                     {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_EE);}
+"EA"                    {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_EEA);}
+"AA"                    {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_AAA);}
+"EAF"                   {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_EAF);}
+"AAF"                   {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_AAF);}
+"EAG"                   {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_EAG);}
+"AAG"                   {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_AAG);}
 "F"                     {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_OP_FUTURE);}
 "O"                     {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_OP_ONCE);}
 "G"                     {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_OP_GLOBAL);}
