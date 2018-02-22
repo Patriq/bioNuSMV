@@ -737,6 +737,13 @@ formulaGetDependenciesRecur(const SymbTable_ptr symb_table,
   case CAST_SIGNED:
   case CAST_UNSIGNED:
   case FLOOR:
+    /* Ignores action */
+  case EAX:
+  case AAX:
+  case EAF:
+  case AAF:
+  case EAG:
+  case AAG:
     result = formulaGetDependenciesRecur(symb_table, car(formula), context,
                                          filter, preserve_time, time,
                                          dependencies_hash);
@@ -793,6 +800,23 @@ formulaGetDependenciesRecur(const SymbTable_ptr symb_table,
 
       result = formulaGetDependenciesRecur(symb_table,
                                            car(formula), context,
+                                           filter, preserve_time, time,
+                                           dependencies_hash);
+      result = Set_Union(result, right);
+      Set_ReleaseSet(right);
+      break;
+    }
+    /* Ignores action */
+  case EAU:
+  case AAU:
+    {
+      Set_t right = formulaGetDependenciesRecur(symb_table,
+                                                cdar(formula), context,
+                                                filter, preserve_time, time,
+                                                dependencies_hash);
+
+      result = formulaGetDependenciesRecur(symb_table,
+                                           caar(formula), context,
                                            filter, preserve_time, time,
                                            dependencies_hash);
       result = Set_Union(result, right);
@@ -1517,12 +1541,36 @@ formulaGetConstantsRecur(const SymbTable_ptr symb_table,
   case TRIGGERED:
   case MAXU:    /* MIN MAX operators */
   case MINU:
+    /* Doesn't ignore action */
+  case EAX:
+  case AAX:
+  case EAF:
+  case AAF:
+  case EAG:
+  case AAG:
     {
       Set_t right = formulaGetConstantsRecur(symb_table, cdr(formula), context,
                                              consts_hash);
       result = formulaGetConstantsRecur(symb_table, car(formula), context,
                                         consts_hash);
       result = Set_Union(result, right);
+      Set_ReleaseSet(right);
+      break;
+    }
+
+    /* Doesn't ignore action */
+  case EAU:
+  case AAU:
+    {
+      Set_t left = formulaGetConstantsRecur(symb_table, caar(formula),
+                                                 context, consts_hash);
+      Set_t right = formulaGetConstantsRecur(symb_table, cdar(formula),
+                                                 context, consts_hash);
+      Set_t action  = formulaGetConstantsRecur(symb_table, cdr(formula),
+                                                 context, consts_hash);
+
+      result = Set_Union(Set_Union(left, right), action);
+      Set_ReleaseSet(action);
       Set_ReleaseSet(right);
       break;
     }

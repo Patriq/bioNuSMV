@@ -1655,6 +1655,25 @@ void ErrorMgr_error_init_exp_contains_input_vars(ErrorMgr_ptr self, node_ptr exp
   ErrorMgr_finish_parsing_err(self);
 }
 
+void ErrorMgr_error_init_simple_exp_is_not_ivar_only_expr(ErrorMgr_ptr self, node_ptr exp)
+{
+  FILE* err;
+  NuSMVEnv_ptr env;
+  MasterPrinter_ptr wffprint;
+
+  ERROR_MGR_CHECK_INSTANCE(self);
+
+  env = EnvObject_get_environment(ENV_OBJECT(self));
+  wffprint = MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+
+  err = StreamMgr_get_error_stream(self->streams);
+
+  ErrorMgr_start_parsing_err(self);
+  StreamMgr_print_error(self->streams, "SIMPLE_EXPR is not an IVAR-only expression:\n");
+  print_node(wffprint, err, exp);
+  ErrorMgr_finish_parsing_err(self);
+}
+
 void ErrorMgr_error_second_player_var(ErrorMgr_ptr self, node_ptr exp)
 {
   FILE* err;

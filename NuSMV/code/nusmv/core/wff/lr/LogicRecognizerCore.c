@@ -184,6 +184,10 @@ LogicType logic_recognizer_core_recognize(LogicRecognizerBase_ptr self,
   case ABU: case EBU:
   case EBF: case ABF: case EBG: case ABG:
   case AU: case EU:
+
+    /* ARCTL */
+  case EAX: case AAX: case EAF: case AAF: case EAG: case AAG:
+  case EAU: case AAU:
     retval = EXP_CTL; break;
 
     /* LTL */

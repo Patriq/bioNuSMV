@@ -249,9 +249,21 @@ static boolean isCorrectExp(node_ptr exp, enum EXP_KIND expectedKind)
       return isCorrectExp(car(exp), EXP_LTL)
         && isCorrectExp(cdr(exp), EXP_LTL); /* continue to check LTL */
 
-     /* ARCTL expressions. Hack to progress further */
-    case EAX: case EAU: case AAX: case AAU: case EAF: case AAF: case EAG: case AAG:
-        return true;
+      /* ARCTL unary expressions. */
+    case EAX: case AAX: case EAF: case AAF: case EAG: case AAG:
+      if (EXP_CTL != expectedKind) {
+        nusmv_yyerror_lined("unexpected CTL operator", node_get_lineno(exp));
+        return false;
+      }
+      return isCorrectExp(car(exp), EXP_CTL) && isCorrectExp(cdr(exp), EXP_SIMPLE);
+
+      /* ARCTL binary expressions */
+    case EAU: case AAU:
+      if (EXP_CTL != expectedKind) {
+        nusmv_yyerror_lined("unexpected CTL operator", node_get_lineno(exp));
+        return false;
+      }
+      return isCorrectExp(car(exp), EXP_CTL) && isCorrectExp(cdr(exp), EXP_SIMPLE);
 
     default: nusmv_assert(false); /* unknown expression */
     }

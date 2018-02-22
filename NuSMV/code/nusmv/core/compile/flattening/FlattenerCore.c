@@ -1523,8 +1523,26 @@ node_ptr flattener_core_flatten(FlattenerBase_ptr self,
     /* CTL bynary operators */
   case EU:
   case AU:
+  case EAX:
+  case AAX:
+  case EAF:
+  case AAF:
+  case EAG:
+  case AAG:
     {
       node_ptr left  = _THROW(car(sexp), symb_table, def_hash, context, mode);
+      node_ptr right = _THROW(cdr(sexp), symb_table, def_hash, context, mode);
+
+      result = new_node(nodemgr, node_get_type(sexp), left, right);
+      break;
+    }
+
+  case AAU:
+  case EAU:
+    {
+      /* left is ctl_expr U ctl_expr*/
+      node_ptr left  = _THROW(car(sexp), symb_table, def_hash, context, mode);
+      /* right is action expression (simple_expr) */
       node_ptr right = _THROW(cdr(sexp), symb_table, def_hash, context, mode);
 
       result = new_node(nodemgr, node_get_type(sexp), left, right);

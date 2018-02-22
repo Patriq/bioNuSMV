@@ -486,6 +486,71 @@ static SymbType_ptr checker_core_check_expr(CheckerBase_ptr self,
       return _SET_TYPE(ctx_expr, type);
     }
 
+  case EAX:
+  case AAX:
+  case EAF:
+  case AAF:
+  case EAG:
+  case AAG:
+  {
+    /* get the operands' type */
+    SymbType_ptr type1 = _THROW(car(expr), context);
+    SymbType_ptr type2 = _THROW(cdr(expr), context);
+
+    if (SymbType_is_error(type1) || SymbType_is_error(type2)) {
+      /*earlier error*/
+      return _SET_TYPE(ctx_expr, SymbTablePkg_error_type(env));
+    }
+
+    /* both operands must be boolean */
+    if (SymbType_is_boolean(type1) && SymbType_is_boolean(type2)) {
+      return _SET_TYPE(ctx_expr, SymbTablePkg_boolean_type(env));
+    }
+
+    /* is this a type error ? */
+    if (_VIOLATION(SymbType_is_back_comp(type1) &&
+                   SymbType_is_back_comp(type2) ?
+                   TC_VIOLATION_TYPE_BACK_COMP :
+                   TC_VIOLATION_TYPE_MANDATORY,
+                   ctx_expr)) {
+      return _SET_TYPE(ctx_expr, SymbTablePkg_error_type(env));
+    }
+
+    /* this is not an error after all -> return boolean type */
+    return _SET_TYPE(ctx_expr, SymbTablePkg_boolean_type(env));
+  }
+
+  case AAU:
+  case EAU:
+  {
+    /* get the operands' type */
+    SymbType_ptr type1 = _THROW(caar(expr), context);
+    SymbType_ptr type2 = _THROW(cdar(expr), context);
+    SymbType_ptr type3 = _THROW(cdr(expr), context);
+
+    if (SymbType_is_error(type1) || SymbType_is_error(type2) || SymbType_is_error(type3)) {
+      /*earlier error*/
+      return _SET_TYPE(ctx_expr, SymbTablePkg_error_type(env));
+    }
+
+    /* both operands must be boolean */
+    if (SymbType_is_boolean(type1) && SymbType_is_boolean(type2) && SymbType_is_boolean(type3)) {
+      return _SET_TYPE(ctx_expr, SymbTablePkg_boolean_type(env));
+    }
+
+    /* is this a type error ? */
+    if (_VIOLATION(SymbType_is_back_comp(type1) &&
+                   SymbType_is_back_comp(type2) &&
+                   SymbType_is_boolean(type3) ?
+                   TC_VIOLATION_TYPE_BACK_COMP :
+                   TC_VIOLATION_TYPE_MANDATORY,
+                   ctx_expr)) {
+      return _SET_TYPE(ctx_expr, SymbTablePkg_error_type(env));
+    }
+
+    /* this is not an error after all -> return boolean type */
+    return _SET_TYPE(ctx_expr, SymbTablePkg_boolean_type(env));
+  }
 
     /* casts: boolean -> Word[1] and Word[1] -> boolean. */
   case CAST_BOOL:
@@ -2384,6 +2449,22 @@ checker_core_viol_handler(CheckerBase_ptr self,
       checker_base_print_type(self, errstream, cdr(expr), context);
       break;
 
+    case EAX:
+    case EAU:
+    case AAX:
+    case AAU:
+    case EAF:
+    case AAF:
+    case EAG:
+    case AAG:
+      StreamMgr_print_error(streams,  "operand types of \"");
+      print_operator(self, errstream, expr);
+      StreamMgr_print_error(streams, "\" : action: ");
+      checker_base_print_type(self, errstream, cdr(expr), context);
+      StreamMgr_print_error(streams, ", expr: ");
+      checker_base_print_type(self, errstream, car(expr), context);
+      break;
+
       /* Unary operators */
     case CAST_BOOL:
     case CAST_WORD1:
@@ -2554,6 +2635,14 @@ static void print_operator(CheckerBase_ptr self, FILE* output_stream,
   case ABG:  fprintf(output_stream,"ABG"); return;
   case ABU:  fprintf(output_stream,"ABU"); return;
   case EBU:  fprintf(output_stream,"EBU"); return;
+  case EAX:  fprintf(output_stream,"EAX"); return;
+  case EAU:  fprintf(output_stream,"EAU"); return;
+  case AAX:  fprintf(output_stream,"AAX"); return;
+  case AAU:  fprintf(output_stream,"AAU"); return;
+  case EAF:  fprintf(output_stream,"EAF"); return;
+  case AAF:  fprintf(output_stream,"AAF"); return;
+  case EAG:  fprintf(output_stream,"EAG"); return;
+  case AAG:  fprintf(output_stream,"AAG"); return;
 
   case WRESIZE: fprintf(output_stream,"resize"); return;
   case WSIZEOF: fprintf(output_stream,"sizeof"); return;

@@ -942,6 +942,7 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
 
     /* boolean unary expression or boolean binary expressions those
        right child can be ignored and which have not to be optimized */
+  case EAX: case AAX: case EAF: case AAF: case EAG: case AAG: /* ignores the action */
   case EX: case AX: case EF: case AF: case EG: case AG:
   case OP_NEXT: case OP_PREC: case OP_NOTPRECNOT: case OP_GLOBAL:
   case OP_HISTORICAL: case OP_FUTURE: case OP_ONCE:
@@ -1009,6 +1010,19 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
       result = PREDICATES_ARBITRARY;
     }
 
+    break;
+
+  case EAU: case AAU: /* ignores action */
+    result = PREDICATES_OVERAPPROX;
+
+    left = pred_extract_process_recur(self, caar(expr), context);
+
+    if (!IS_OVER_APPROX(left)) {
+      if (Nil != cdr(expr)) {
+        right = pred_extract_process_recur(self, cdar(expr), context);
+      }
+      result = PREDICATES_ARBITRARY;
+    }
     break;
 
     /* binary expression which may or may not be boolean and

@@ -652,6 +652,7 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
 
     /* unary expression
        or binary expressions those right child has not to be normalized */
+  case EAX: case AAX: case EAF: case AAF: case EAG: case AAG: /* ignores the action */
   case EX: case AX: case EF: case AF: case EG: case AG:
   case OP_NEXT: case OP_PREC: case OP_NOTPRECNOT: case OP_GLOBAL:
   case OP_HISTORICAL: case OP_FUTURE: case OP_ONCE:
@@ -729,6 +730,23 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
     }
     else { /* this is not a boolean => push all ITE up.
             note that temporal operators cannot be here as they are boolean. */
+      result = pred_norm_push_ite_up(self, node_type, op1, op2);
+    }
+
+    break;
+  }
+
+  case EAU: case AAU: { /* ignore action */
+    node_ptr op1 =
+        pred_norm_normalise(self, caar(expr), context, expand_defines);
+    node_ptr op2 = Nil == cdar(expr)
+                   ? Nil
+                   : pred_norm_normalise(self, cdar(expr), context, expand_defines);
+
+    if (SymbType_is_boolean(type)) { /* this is boolean => just return */
+      result = pred_norm_find_node(self, node_type, op1, op2);
+    }
+    else {
       result = pred_norm_push_ite_up(self, node_type, op1, op2);
     }
 
@@ -1165,6 +1183,8 @@ static node_ptr pred_norm_find_node(PredicateNormaliser_ptr self,
   case NUMBER_FRAC: case NUMBER_REAL:
   case NUMBER_EXP:
   case TWODOTS:  case CONCATENATION:
+  case EAX: case AAX: case EAF: case AAF: case EAG: case AAG:
+  case EAU: case AAU:
   case EX: case AX: case EF: case AF: case EG: case AG:
   case ABU: case EBU: case EBF: case ABF: case EBG: case ABG:
   case AU: case EU:
@@ -1609,6 +1629,7 @@ pred_norm_get_predicates_only(const PredicateNormaliser_ptr self,
     /* unary expressions whose operands are boolean */
   case NEXT: case SMALLINIT:
   case NOT:
+  case EAX: case AAX: case EAF: case AAF: case EAG: case AAG: /* ignores the action */
   case EX: case AX: case EF: case AF: case EG:  case AG:
   case EBF: case ABF: case EBG: case ABG: /* ignore the number..number part */
   case ABU: case EBU: /* ignore the number..number part */
@@ -1622,6 +1643,11 @@ pred_norm_get_predicates_only(const PredicateNormaliser_ptr self,
   case AU: case EU: case UNTIL: case SINCE: case CONS:
     pred_norm_get_predicates_only(self, preds, car(expr), already_processed);
     pred_norm_get_predicates_only(self, preds, cdr(expr), already_processed);
+    break;
+
+  case EAU: case AAU: /* ignores the action */
+    pred_norm_get_predicates_only(self, preds, caar(expr), already_processed);
+    pred_norm_get_predicates_only(self, preds, cdar(expr), already_processed);
     break;
 
     /* operand of bool-cast is always word[1] => add it */

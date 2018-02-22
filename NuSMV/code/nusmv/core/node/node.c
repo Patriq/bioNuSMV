@@ -178,8 +178,12 @@ boolean Node_is_temporal_op(node_ptr const node)
   case EX: case AX: case EF: case AF: case EG: case AG:
   case ABU: case EBU:
   case EBF: case ABF: case EBG: case ABG:
+    /* ARCTL "unary" expressions */
+  case EAX: case AAX: case EAF: case AAF: case EAG: case AAG:
     /* CTL binary expressions */
   case AU: case EU:
+    /* ARCTL "binary" expressions */
+  case AAU: case EAU:
     /* LTL unary expressions */
   case OP_NEXT: case OP_PREC: case OP_NOTPRECNOT: case OP_GLOBAL:
   case OP_HISTORICAL: case OP_FUTURE: case OP_ONCE:

@@ -331,6 +331,13 @@ dependency_core_get_dependencies(DependencyBase_ptr self,
   case CAST_SIGNED:
   case CAST_UNSIGNED:
   case FLOOR:
+    /* Ignores action */
+  case EAX:
+  case AAX:
+  case EAF:
+  case AAF:
+  case EAG:
+  case AAG:
     result = _THROW(symb_table, car(formula), context, filter,
                     preserve_time, time, dependencies_hash);
     break;
@@ -387,6 +394,20 @@ dependency_core_get_dependencies(DependencyBase_ptr self,
       Set_ReleaseSet(right);
       break;
     }
+
+    /* Ignores action */
+  case EAU:
+  case AAU:
+  {
+    Set_t right = _THROW(symb_table, cdar(formula), context, filter,
+                         preserve_time, time, dependencies_hash);
+
+    result = _THROW(symb_table, caar(formula), context, filter,
+                    preserve_time, time, dependencies_hash);
+    result = Set_Union(result, right);
+    Set_ReleaseSet(right);
+    break;
+  }
 
     /* 3-arity operations */
   case CASE:

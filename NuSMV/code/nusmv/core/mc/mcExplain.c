@@ -1228,6 +1228,130 @@ static node_ptr explain_recur(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr path,
                       constant */
     }
 
+    case EAX:
+    {
+      // So far its the same as EX.
+      a1 = eval_ctl_spec(fsm, enc, car(formula_expr), context);
+      ErrorMgr_set_the_node(errmgr, formula_expr);
+      new_path = ex_explain(fsm, enc, path, a1);
+      bdd_free(dd_manager, a1);
+      if (new_path != Nil) {
+        node_ptr q = explain_recur(fsm, enc, new_path, car(formula_expr),
+                                   context);
+        if (q != Nil) return q;
+      }
+      return new_path;
+    }
+
+    case EAU: {
+      // So far its the same as EU
+      a1 = eval_ctl_spec(fsm, enc, caar(formula_expr), context);
+      a2 = eval_ctl_spec(fsm, enc, cdar(formula_expr), context);
+      ErrorMgr_set_the_node(errmgr, formula_expr);
+      new_path = eu_explain(fsm, enc, path, a1, a2);
+      bdd_free(dd_manager, a2);
+      bdd_free(dd_manager, a1);
+      if (new_path != Nil) {
+        node_ptr q = explain_recur(fsm, enc, new_path, cdr(formula_expr),
+                                   context);
+
+        if (q != Nil) return q;
+      }
+      return new_path;
+    }
+
+    case AAX:
+    {
+      // AAX(act)(ctl_expr) = !EAX(act)(!ctl_expr)
+      node_ptr act = cdr(formula_expr);
+      node_ptr phi = car(formula_expr);
+      return explain_recur(fsm, enc, path,
+                           find_node(nodemgr, NOT,
+                                     find_node(nodemgr, EAX,
+                                               find_node(nodemgr, NOT, phi, Nil),
+                                               act),
+                                     Nil),
+                           context);
+    }
+
+    case AAU:
+    {
+      // AAU(act)[f U g] = !(EAU(action)[!g U (!f and !g)] OR EAG(action)(!g))
+      node_ptr act = cdr(formula_expr);
+      node_ptr f = caar(formula_expr);
+      node_ptr g = cdar(formula_expr);
+      return explain_recur(fsm, enc, path,
+                           find_node(nodemgr, NOT,
+                                     find_node(nodemgr, OR,
+                                               // EAU(action)[!g U (!f and !g)]
+                                               find_node(nodemgr, EAU,
+                                                         find_node(nodemgr, EU,
+                                                                   find_node(nodemgr, NOT, g, Nil),
+                                                                   find_node(nodemgr, AND,
+                                                                             find_node(nodemgr, NOT, f, Nil),
+                                                                             find_node(nodemgr, NOT, g, Nil))),
+                                                         act),
+                                               // EAG(action)(!g)
+                                               find_node(nodemgr, EAG, find_node(nodemgr, NOT, g, Nil), act)),
+                                     Nil),
+                           context);
+    }
+
+    case EAF:
+    {
+      // EAF(action)(ctl_expr) = EAU(action)[TRUE U ctl_expr]
+      node_ptr act = cdr(formula_expr);
+      node_ptr phi = car(formula_expr);
+      return explain_recur(fsm, enc, path,
+                           find_node(nodemgr, EAU,
+                                     find_node(nodemgr, EU, ExprMgr_true(exprs), phi),
+                                     act),
+                           context);
+    }
+
+    case AAF:
+    {
+      // AAF(action)(ctl_expr) = !EAG(action)(!ctl_expr)
+      node_ptr act = cdr(formula_expr);
+      node_ptr phi = car(formula_expr);
+      return explain_recur(fsm, enc, path,
+                           find_node(nodemgr, NOT,
+                                     find_node(nodemgr, EAG,
+                                               find_node(nodemgr, NOT, phi, Nil),
+                                               act
+                                     ), Nil),
+                           context);
+    }
+
+    case EAG:
+    {
+      // EAG[ act, g ] = EAU[ act, g, g & !EAX[ act, true]] | !EG_SI[act, g]
+      //                           |
+      //                           |   Is it the same?!? The above was in the mcMc.c of arctl-orig
+      //                           V
+      // EAG(action)(ctl_expr) = EAU(action)[g U g & !EAX(action)(true)] | !EG_SI[action, g]
+      // So far same as EG
+      a1 = eval_ctl_spec(fsm, enc, car(formula_expr), context);
+      ErrorMgr_set_the_node(errmgr, formula_expr);
+      new_path = eg_explain(fsm, enc, path, a1);
+      bdd_free(dd_manager, a1);
+      return new_path;
+    }
+
+    case AAG:
+    {
+      // AAG(action)(ctl_expr) = !EAF(action)(!ctl_expr)
+      node_ptr act = cdr(formula_expr);
+      node_ptr phi = car(formula_expr);
+      return explain_recur(fsm, enc, path,
+                           find_node(nodemgr, NOT,
+                                     find_node(nodemgr, EAF,
+                                               find_node(nodemgr, NOT, phi, Nil),
+                                               act
+                                     ), Nil),
+                           context);
+    }
+
   default:
     return Nil;
   }

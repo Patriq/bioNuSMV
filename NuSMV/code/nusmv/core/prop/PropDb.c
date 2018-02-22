@@ -101,6 +101,14 @@ static const char*
 prop_db_get_prop_type_as_parsing_string(PropDb_ptr self,
                                         const Prop_Type type);
 
+static boolean are_simple_expr_invar_only_formulae(PropDb_ptr self,
+                                                   SymbTable_ptr symb_table,
+                                                   node_ptr formula);
+
+static boolean is_input_variable_formula(PropDb_ptr self,
+                                         SymbTable_ptr symb_table,
+                                         node_ptr formula);
+
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
@@ -1033,12 +1041,13 @@ int prop_db_prop_create_and_add(PropDb_ptr self, SymbTable_ptr symb_table,
     OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   int retval, index;
-  boolean allow_adding, allow_checking, is_ctl;
+  boolean allow_adding1, allow_adding2, allow_checking, is_ctl;
   Prop_ptr prop;
 
   retval = 0;
   index = PropDb_get_size(self);
-  allow_adding = true;
+  allow_adding1 = true;
+  allow_adding2 = true;
   allow_checking = true;
   is_ctl = (type == Prop_Ctl);
   prop = NULL;
@@ -1094,8 +1103,11 @@ int prop_db_prop_create_and_add(PropDb_ptr self, SymbTable_ptr symb_table,
                                           Prop_get_expr_core(prop),
                                           Nil);
 
-      allow_adding = !SymbTable_list_contains_input_var(symb_table, Set_Set2List(expr_vars));
+      allow_adding1 = !SymbTable_list_contains_input_var(symb_table, Set_Set2List(expr_vars));
       Set_ReleaseSet(expr_vars);
+
+      /* check whether simple expressions of spec are ivar-only expressions */
+      allow_adding2 = are_simple_expr_invar_only_formulae(self, symb_table, spec);
     }
 
     /* Check for next operators. Only invarspecs and ltl can contain next
@@ -1117,8 +1129,13 @@ int prop_db_prop_create_and_add(PropDb_ptr self, SymbTable_ptr symb_table,
 
   }
 
-  /* If no input vars present then add property to database */
-  if (allow_adding) {
+   if (!allow_adding1) {
+    /* Property contains input variables */
+    ErrorMgr_error_property_contains_input_vars(errmgr, prop);
+  } else if (!allow_adding2) {
+    ErrorMgr_error_init_simple_exp_is_not_ivar_only_expr(errmgr, spec);
+  } else {
+    /* If no input vars present then add property to database */
     if (opt_verbose_level_gt(opts, 3)) {
       Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
       Logger_log(logger,
@@ -1140,10 +1157,6 @@ int prop_db_prop_create_and_add(PropDb_ptr self, SymbTable_ptr symb_table,
                 Prop_get_type_as_string(prop), index);
       }
     }
-  }
-  else {
-    /* Property contains input variables */
-    ErrorMgr_error_property_contains_input_vars(errmgr, prop);
   }
 
   retval = (retval == 1) ? -1 : index;
@@ -1296,6 +1309,170 @@ prop_db_get_prop_type_as_parsing_string(PropDb_ptr self, const Prop_Type type)
   }
 
   return "SIMPWFF ";
+}
+
+/*!
+  \brief Returns whether or not, actions (simple expressions)
+  in action based operators are composed of input variables only.
+
+  Returns whether or not, actions (simple expressions)
+  in action based operators are composed of input variables only.
+*/
+static boolean are_simple_expr_invar_only_formulae(PropDb_ptr self,
+                                                   SymbTable_ptr symb_table,
+                                                   const node_ptr formula) {
+  if (formula == Nil) {
+    return true;
+  }
+
+  switch (node_get_type(formula)) {
+    case CONTEXT:
+      return are_simple_expr_invar_only_formulae(self, symb_table, cdr(formula));
+
+    case TRUEEXP:
+    case FALSEEXP:
+    case NUMBER:
+    case ATOM:
+    case DOT:
+    case ARRAY:
+
+      /* Sets */
+    case TWODOTS:
+    case UNION:
+    case SETIN:
+
+      /* Numerical Operations */
+    case PLUS:
+    case MINUS:
+    case TIMES:
+    case DIVIDE:
+    case MOD:
+
+      /* Comparison Operations */
+    case EQUAL:
+    case NOTEQUAL:
+    case LT:
+    case GT:
+    case LE:
+    case GE:
+    case NEXT:
+      break;
+
+    case NOT:
+      return are_simple_expr_invar_only_formulae(self, symb_table, car(formula));
+
+      /* Binary boolean connectives */
+    case AND:
+    case OR:
+    case XOR:
+    case XNOR:
+    case IMPLIES:
+    case IFF:
+    {
+      const node_ptr left_formula = car(formula);
+      const node_ptr right_formula = cdr(formula);
+      return are_simple_expr_invar_only_formulae(self, symb_table, left_formula) && are_simple_expr_invar_only_formulae(self, symb_table, right_formula);
+    }
+    case CASE:
+      break;
+
+      /* CTL unary Temporal Operators */
+    case EG:
+    case EX:
+    case EF:
+    case AG:
+    case AX:
+    case AF:
+      return are_simple_expr_invar_only_formulae(self, symb_table, car(formula));
+
+      /* CTL binary  Temporal Operators */
+    case EU:
+    case AU:
+    {
+      const node_ptr left_formula = car(formula);
+      const node_ptr right_formula = cdr(formula);
+      return are_simple_expr_invar_only_formulae(self, symb_table, left_formula) && are_simple_expr_invar_only_formulae(self, symb_table, right_formula);
+    }
+    case EAX:
+    case EAU:
+    case AAX:
+    case AAU:
+    case EAF:
+    case AAF:
+    case EAG:
+    case AAG:
+    {
+      const node_ptr left_formula = car(formula);
+      const node_ptr right_formula = cdr(formula);
+      return is_input_variable_formula(self, symb_table, right_formula) && are_simple_expr_invar_only_formulae(self, symb_table, left_formula);
+    }
+
+      /* CTL unary bounded Temporal Operators */
+    case EBF:
+    case ABF:
+    case EBG:
+    case ABG:
+
+      /* CTL binary bounded Temporal Operators */
+    case EBU:
+    case ABU:
+
+      /* LTL unary Temporal Operators */
+    case OP_NEXT:
+    case OP_PREC:
+    case OP_NOTPRECNOT:
+    case OP_FUTURE:
+    case OP_ONCE:
+    case OP_GLOBAL:
+    case OP_HISTORICAL:
+
+      /* LTL binary Temporal Operators */
+    case UNTIL:
+    case RELEASES:
+    case SINCE:
+    case TRIGGERED:
+
+      /* MIN MAX operators */
+    case MAXU:
+    case MINU:
+      break;
+    default: {
+      const NuSMVEnv_ptr env = ENV_OBJECT(self)->environment;
+      const ErrorMgr_ptr errormgr =
+          ERROR_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      ErrorMgr_internal_error(errormgr, "Formula_GetDependencies: Reached undefined connective (%d)\n",
+                              node_get_type(formula));
+      break;
+    }
+  }
+
+  return true;
+}
+
+/*!
+  \brief Returns whether or not a given formula is composed of input variables only.
+
+  Returns whether or not a given formula is composed of input variables only.
+*/
+static boolean is_input_variable_formula(PropDb_ptr self,
+                                         SymbTable_ptr symb_table,
+                                         node_ptr formula) {
+  Set_t dep_set = Formula_GetDependencies(symb_table, formula, Nil);
+
+  Set_Iterator_t iter;
+  boolean result = true;
+
+  iter = Set_GetFirstIter(dep_set);
+  while (result && !Set_IsEndIter(iter)) {
+    const node_ptr curr_var = (node_ptr) Set_GetMember(dep_set, iter);
+    if (!SymbTable_is_symbol_input_var(symb_table, curr_var)) {
+      result = false;
+    }
+    iter = Set_GetNextIter(iter);
+  }
+
+  Set_ReleaseSet(dep_set);
+  return result;
 }
 
 

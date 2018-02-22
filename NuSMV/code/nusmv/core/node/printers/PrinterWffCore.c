@@ -160,12 +160,18 @@ int printer_wff_core_print_node(PrinterBase_ptr self, node_ptr n, int priority)
 
   char* op;
   int pr_tmp;
-  int arity;     /* 0: unary, 1: binary, 2: terciary, 3:quad */
+  int arity = 0;     /* 0: unary, 1: binary, 2: terciary, 3:quad */
+  /* Using arity 10 to denote arity = 2,
+  post-fix (for EAX (act) (formula) and others), and arity 11 for EAU
+  and AAU  */
   int brckts;
 
   op = (char*) NULL;
   pr_tmp = 0;
   arity = 0;     /* 0: unary, 1: binary, 2: terciary, 3:quad */
+  /* Using arity 10 to denote arity = 2,
+  post-fix (for EAX (act) (formula) and others), and arity 11 for EAU
+  and AAU  */
   brckts = 0;
 
   if (n == Nil) return 1;
@@ -532,6 +538,23 @@ int printer_wff_core_print_node(PrinterBase_ptr self, node_ptr n, int priority)
     if (!_PRINT("A")) return 0;
     op = "U"; pr_tmp = 8; priority = 9; arity = 1; brckts = 1; break;
 
+  case EAX:
+    op = "EAX"; pr_tmp = 8; priority = 9; arity = 10; brckts = 1; break;
+  case EAU:
+    op = "EA"; pr_tmp = 8; priority = 9; arity = 11; brckts = 1; break;
+  case AAX:
+    op = "AAX"; pr_tmp = 8; priority = 9; arity = 10; brckts = 1; break;
+  case AAU:
+    op = "AA"; pr_tmp = 8; priority = 9; arity = 11; brckts = 1; break;
+  case EAF:
+    op = "EAF"; pr_tmp = 8; priority = 9; arity = 10; brckts = 1; break;
+  case AAF:
+    op = "AAF"; pr_tmp = 8; priority = 9; arity = 10; brckts = 1; break;
+  case EAG:
+    op = "EAG"; pr_tmp = 8; priority = 9; arity = 10; brckts = 1; break;
+  case AAG:
+    op = "AAG"; pr_tmp = 8; priority = 9; arity = 10; brckts = 1; break;
+
   case EBU:
     if (!_PRINT("E")) return 0;
     op = "BU"; pr_tmp = 8; priority = 9; arity = 3; brckts = 1; break;
@@ -668,6 +691,25 @@ int printer_wff_core_print_node(PrinterBase_ptr self, node_ptr n, int priority)
     if (!_THROW(cdr(cdr(n)), pr_tmp)) return 0; /* b */
     if (!_PRINT(" ")) return 0;
     if (!_THROW(cdr(car(n)), pr_tmp)) return 0; /* g */
+    break;
+
+  case 10:
+    /* EAX act f */
+    if (!_PRINT(op)) return(0);
+    if (!_PRINT(" ")) return(0);
+    if (!_THROW(cdr(n), pr_tmp)) return(0);
+    if (!_PRINT(" ")) return(0);
+    if (!_THROW(car(n), pr_tmp)) return(0);
+    break;
+  case 11:
+    /* EAU act [f U g]*/
+    if (!_PRINT(op)) return(0);
+    if (!_PRINT(" ")) return(0);
+    if (!_THROW(cdr(n), pr_tmp)) return(0);
+    if (!_PRINT(" ")) return(0);
+    if (!_THROW(caar(n), pr_tmp)) return(0);
+    if (!_PRINT(" U ")) return(0);
+    if (!_THROW(cdar(n), pr_tmp))return(0);
     break;
   } /* switch on arity */
 

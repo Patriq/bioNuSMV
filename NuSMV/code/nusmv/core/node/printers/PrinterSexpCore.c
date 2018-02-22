@@ -802,6 +802,64 @@ int printer_sexp_core_print_node(PrinterBase_ptr self, node_ptr node,
       _PRINT(")");
     break;
 
+  case EAX:
+    result = _PRINT("\n(EAX ") &&
+             _THROW(cdr(node), 0) &&
+             _THROW(car(node), 0) &&
+             _PRINT(")");
+    break;
+
+  case EAU:
+    result = _PRINT("\n(EAU ") &&
+             _THROW(caar(node), 0) &&
+             _THROW(cdar(node), 0) &&
+             _THROW(cdr(node), 0) &&
+             _PRINT(")");
+    break;
+
+  case AAX:
+    result = _PRINT("\n(AAX ") &&
+             _THROW(cdr(node), 0) &&
+             _THROW(car(node), 0) &&
+             _PRINT(")");
+    break;
+
+  case AAU:
+    result = _PRINT("\n(AAU ") &&
+             _THROW(caar(node), 0) &&
+             _THROW(cdar(node), 0) &&
+             _THROW(cdr(node), 0) &&
+             _PRINT(")");
+    break;
+
+  case EAF:
+    result = _PRINT("\n(EAF ") &&
+             _THROW(cdr(node), 0) &&
+             _THROW(car(node), 0) &&
+             _PRINT(")");
+    break;
+
+  case AAF:
+    result = _PRINT("\n(AAF ") &&
+             _THROW(cdr(node), 0) &&
+             _THROW(car(node), 0) &&
+             _PRINT(")");
+    break;
+
+  case EAG:
+    result = _PRINT("\n(EAG ") &&
+             _THROW(cdr(node), 0) &&
+             _THROW(car(node), 0) &&
+             _PRINT(")");
+    break;
+
+  case AAG:
+    result = _PRINT("\n(AAG ") &&
+             _THROW(cdr(node), 0) &&
+             _THROW(car(node), 0) &&
+             _PRINT(")");
+    break;
+
   case EBF:
     result = _PRINT("\n(EBF ") &&
       _THROW(car(node), 0) &&

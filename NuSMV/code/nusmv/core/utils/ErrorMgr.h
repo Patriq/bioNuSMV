@@ -1066,6 +1066,15 @@ ErrorMgr_error_init_exp_contains_input_vars (ErrorMgr_ptr self, node_ptr exp) NU
 
 /*!
   \methodof ErrorMgr
+  \brief
+
+
+*/
+void
+ErrorMgr_error_init_simple_exp_is_not_ivar_only_expr(ErrorMgr_ptr self, node_ptr exp) NUSMV_FUNCATTR_NORETURN;
+
+/*!
+  \methodof ErrorMgr
   \brief 
 
   TODO[AMA] This should not stay here, see issue 4485

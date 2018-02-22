@@ -2229,6 +2229,14 @@ Expr_ptr ExprMgr_resolve(const ExprMgr_ptr self, SymbTable_ptr st,
   case SMALLINIT:
 
     /* no simplification in current implementation: */
+  case EAX:
+  case EAU:
+  case AAX:
+  case AAU:
+  case EAF:
+  case AAF:
+  case EAG:
+  case AAG:
   case EX:
   case AX:
   case EG:
@@ -2784,6 +2792,9 @@ boolean ExprMgr_is_syntax_correct(Expr_ptr exp, ExprKind expectedKind)
     }
     return ExprMgr_is_syntax_correct(car(exp), EXPR_CTL);
 
+    /* ARCTL */
+  case EAX: case AAX: case EAF: case AAF: case EAG: case AAG:
+  case EAU: case AAU:
     /* CTL binary expressions */
   case AU: case EU:
     if (EXPR_CTL != expectedKind) {
@@ -3315,6 +3326,14 @@ static Expr_ptr expr_simplify_aux(ExprMgr_ptr self,
   case CONTEXT:
 
     /* no simplification in current implementation: */
+  case EAX:
+  case EAU:
+  case AAX:
+  case AAU:
+  case EAF:
+  case AAF:
+  case EAG:
+  case AAG:
   case EX:
   case AX:
   case EG:

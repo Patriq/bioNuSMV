@@ -354,6 +354,60 @@ BddStates eu(BddFsm_ptr, BddStates, BddStates);
 BddStates au(BddFsm_ptr, BddStates, BddStates);
 
 /*!
+  \brief Set of states satisfying <i>EAX(g)</i>.
+
+  Computes the set of states satisfying <i>EAX(g)</i>.
+
+  \sa ex
+*/
+BddStates eax(BddFsm_ptr, BddStates, BddStates);
+
+/*!
+  \brief Set of states satisfying <i>EAU\[ act_expr ctl_expr ctl_expr\]</i>.
+
+  Computes the set of states satisfying <i>EAU\[act_expr ctl_expr ctl_expr\]</i>.
+
+  \sa ex, eu
+*/
+BddStates eau(BddFsm_ptr, BddStates, BddStates, BddStates);
+
+/*!
+  \brief Set of states satisfying <i>AAX(g)</i>.
+
+  Computes the set of states satisfying <i>AAX(g)</i>.
+
+  \sa ex
+*/
+BddStates aax(BddFsm_ptr, BddStates, BddStates);
+
+/*!
+  \brief Set of states satisfying <i>AAU\[ act_expr ctl_expr ctl_expr\]</i>.
+
+  Computes the set of states satisfying <i>AAU\[act_expr ctl_expr ctl_expr\]</i>.
+
+  \sa ex, eu
+*/
+BddStates aau(BddFsm_ptr, BddStates, BddStates, BddStates);
+
+/*!
+  \brief Set of states satisfying <i>EAF(g)</i>.
+
+  Computes the set of states satisfying <i>EAF(g)</i>.
+
+  \sa ex
+*/
+BddStates eaf(BddFsm_ptr, BddStates, BddStates);
+
+/*!
+  \brief Set of states satisfying <i>EAG(g)</i>.
+
+  Computes the set of states satisfying <i>EAG(g)</i>.
+
+  \sa ex
+*/
+BddStates eag(BddFsm_ptr, BddStates, BddStates);
+
+/*!
   \brief Set of states satisfying <i>E\[f U^{inf..sup} g\]</i>.
 
   Computes the set of states satisfying

@@ -58,6 +58,7 @@ typedef bdd_ptr (*BDDPFDB)(DDMgr_ptr , bdd_ptr);
 typedef bdd_ptr (*BDDPFFB)(BddFsm_ptr, bdd_ptr);
 typedef bdd_ptr (*BDDPFDBB)(DDMgr_ptr , bdd_ptr, bdd_ptr);
 typedef bdd_ptr (*BDDPFFBB)(BddFsm_ptr, bdd_ptr, bdd_ptr);
+typedef bdd_ptr (*BDDPFFBBB)(BddFsm_ptr, bdd_ptr, bdd_ptr, bdd_ptr);
 typedef bdd_ptr (*BDDPFDBII)(DDMgr_ptr , bdd_ptr, int, int);
 typedef bdd_ptr (*BDDPFFBII)(BddFsm_ptr, bdd_ptr, int, int);
 typedef bdd_ptr (*BDDPFDBBII)(DDMgr_ptr , bdd_ptr, bdd_ptr, int, int);
@@ -87,6 +88,8 @@ static bdd_ptr ternary_mod_bdd_op(BddFsm_ptr, BddEnc_ptr, BDDPFFBII,
                                   node_ptr, int, int, node_ptr);
 static bdd_ptr quad_mod_bdd_op(BddFsm_ptr, BddEnc_ptr, BDDPFFBBII,
                                node_ptr, int, int, int, node_ptr);
+static bdd_ptr binary_act_bdd_op(BddFsm_ptr, BddEnc_ptr, BDDPFFBBB,
+					                     node_ptr, int, int, int, node_ptr);
 
 
 /*---------------------------------------------------------------------------*/
@@ -199,6 +202,14 @@ static bdd_ptr eval_ctl_spec_recur(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr n,
   case AG:      return(unary_mod_bdd_op(fsm, enc, ef, n, -1, -1, context));
   case AF:      return(unary_mod_bdd_op(fsm, enc, eg, n, -1, -1, context));
   case EG:      return(unary_mod_bdd_op(fsm, enc, eg, n,  1,  1, context));
+  case EAX:     return(binary_mod_bdd_op(fsm, enc, eax, n, 1, 1, 1, context));
+  case EAU:     return(binary_act_bdd_op(fsm, enc, eau, n, 1, 1, 1, context));
+  case AAX:     return(binary_mod_bdd_op(fsm, enc, aax, n, 1, 1, 1, context));
+  case AAU:     return(binary_act_bdd_op(fsm, enc, aau, n, 1, 1, 1, context));
+  case EAF:     return(binary_mod_bdd_op(fsm, enc, eaf, n, 1, 1, 1, context));
+  case AAF:     return(binary_mod_bdd_op(fsm, enc, eag, n, -1, -1, 1, context));
+  case EAG:     return(binary_mod_bdd_op(fsm, enc, eag, n, 1, 1, 1, context));
+  case AAG:     return(binary_mod_bdd_op(fsm, enc, eaf, n, -1, -1, 1, context));
   case EU:      return(binary_mod_bdd_op(fsm, enc, eu, n, 1, 1, 1, context));
   case AU:      return(binary_mod_bdd_op(fsm, enc, au, n, 1, 1, 1, context));
   case EBU:     return(quad_mod_bdd_op(fsm, enc, ebu, n, 1, 1, 1, context));
@@ -584,4 +595,52 @@ static bdd_ptr quad_mod_bdd_op(BddFsm_ptr fsm, BddEnc_ptr enc, BDDPFFBBII op,
   return res;
 }
 
+/*!
+  \brief Applies binary operation with actions.
 
+  Takes in input the expression <code>n</code> and a
+  binary operation <code>op</code>. Extracts from <code>n</n> the
+  action expression and the ctl operands operands and evaluates
+  them. The binary operator <code>op</code> is then applied to these
+  partial results. The sign of the partial results and of the result
+  depends respectively from the flags <code>argflag1</code>,
+  <code>argflag2</code> and <code>resflag</code>.
+
+  \sa unary_bdd_op, ternary_bdd_op, quaternary_bdd_op
+*/
+static bdd_ptr binary_act_bdd_op(BddFsm_ptr fsm, BddEnc_ptr enc, BDDPFFBBB op,
+                                 node_ptr n, int resflag, int argflag1,
+                                 int argflag2, node_ptr context)
+{
+  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
+  const ErrorMgr_ptr errmgr =
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+
+  bdd_ptr tmp_1, tmp_2, tmp_3, tmp_4, res;
+  DDMgr_ptr dd;
+  bdd_ptr arg1 = eval_ctl_spec(fsm, enc, cdr(n), context);
+  /* arg1 = actions */
+  bdd_ptr arg2 = eval_ctl_spec(fsm, enc, caar(n), context);
+  bdd_ptr arg3 = eval_ctl_spec(fsm, enc, cdar(n), context);
+  dd = BddEnc_get_dd_manager(enc);
+
+  ErrorMgr_set_the_node(errmgr, n);
+
+  tmp_1 = BddEnc_eval_sign_bdd(enc, arg1, 1);
+  /* argflag1 and argflag2 is for ctl expressions */
+  tmp_2 = BddEnc_eval_sign_bdd(enc, arg2, argflag1);
+  tmp_3 = BddEnc_eval_sign_bdd(enc, arg3, argflag2);
+  tmp_4 = op(fsm, tmp_2, tmp_3, tmp_1);
+
+  res = BddEnc_eval_sign_bdd(enc, tmp_4, resflag);
+
+  bdd_free(dd, tmp_1);
+  bdd_free(dd, tmp_2);
+  bdd_free(dd, tmp_3);
+  bdd_free(dd, tmp_4);
+  bdd_free(dd, arg1);
+  bdd_free(dd, arg2);
+  bdd_free(dd, arg3);
+
+  return(res);
+}

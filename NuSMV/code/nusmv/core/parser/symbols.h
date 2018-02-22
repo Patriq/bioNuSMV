@@ -220,20 +220,21 @@ enum NUSMV_CORE_SYMBOLS {
 
   CAST_TO_UNSIGNED_WORD, /* integer to bv conversion */
 
+  /* ARCTL symbols */
+  EAX, /* complete */ /* 255*/
+  EAU, /* complete */
+  AAX, /* complete */
+  AAU, /* complete */
+  EAF, /* complete */
+  AAF, /* complete */
+  EAG, /* complete */
+  AAG, /* complete */
+
   NUSMV_EXPR_SYMBOL_LAST,
   /* ---------------------------------------------------------------------- */
 
   NUSMV_CORE_SYMBOL_LAST,
 
-  /* ARCTL symbols */
-  EAX, /* 257*/
-  EAU,
-  AAX,
-  AAU,
-  EAF,
-  AAF,
-  EAG,
-  AAG,
 };
 
 

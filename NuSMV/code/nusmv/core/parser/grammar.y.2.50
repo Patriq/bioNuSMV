@@ -274,16 +274,16 @@ ctl_expr     : relational_expr
 pure_ctl_expr
              : TOK_EX ctl_expr       { $$ = new_lined_node(NODEMGR, EX, $2, Nil, $1); }
              | TOK_AX ctl_expr       { $$ = new_lined_node(NODEMGR, AX, $2, Nil, $1); }
-             | TOK_EAX action_expr ctl_expr { $$ = new_lined_node(NODEMGR, EAX, $2, $3, $1); }
-             | TOK_AAX action_expr ctl_expr { $$ = new_lined_node(NODEMGR, AAX, $2, $3, $1); }
+             | TOK_EAX action_expr ctl_expr { $$ = new_lined_node(NODEMGR, EAX, $3, $2, $1); }
+             | TOK_AAX action_expr ctl_expr { $$ = new_lined_node(NODEMGR, AAX, $3, $2, $1); }
              | TOK_EF ctl_expr       { $$ = new_lined_node(NODEMGR, EF, $2, Nil, $1); }
              | TOK_AF ctl_expr       { $$ = new_lined_node(NODEMGR, AF, $2, Nil, $1); }
              | TOK_EG ctl_expr       { $$ = new_lined_node(NODEMGR, EG, $2, Nil, $1); }
              | TOK_AG ctl_expr       { $$ = new_lined_node(NODEMGR, AG, $2, Nil, $1); }
-             | TOK_EAF action_expr ctl_expr { $$ = new_lined_node(NODEMGR, EAF, $2, $3, $1); }
-             | TOK_AAF action_expr ctl_expr { $$ = new_lined_node(NODEMGR, AAF, $2, $3, $1); }
-             | TOK_EAG action_expr ctl_expr { $$ = new_lined_node(NODEMGR, EAG, $2, $3, $1); }
-             | TOK_AAG action_expr ctl_expr { $$ = new_lined_node(NODEMGR, AAG, $2, $3, $1); }
+             | TOK_EAF action_expr ctl_expr { $$ = new_lined_node(NODEMGR, EAF, $3, $2, $1); }
+             | TOK_AAF action_expr ctl_expr { $$ = new_lined_node(NODEMGR, AAF, $3, $2, $1); }
+             | TOK_EAG action_expr ctl_expr { $$ = new_lined_node(NODEMGR, EAG, $3, $2, $1); }
+             | TOK_AAG action_expr ctl_expr { $$ = new_lined_node(NODEMGR, AAG, $3, $2, $1); }
              | TOK_AA TOK_LB ctl_basic_expr TOK_UNTIL ctl_basic_expr TOK_RB
                                      { $$ = new_lined_node(NODEMGR, AU, $3, $5, $1); }
              | TOK_EE TOK_LB ctl_basic_expr TOK_UNTIL ctl_basic_expr TOK_RB
@@ -293,9 +293,9 @@ pure_ctl_expr
              | TOK_EE TOK_LB ctl_basic_expr TOK_BUNTIL subrange ctl_basic_expr TOK_RB
                                      { $$ = new_lined_node(NODEMGR, EBU, new_lined_node(NODEMGR, EU, $3, $6, $1), $5, $1); }
              | TOK_EEA action_expr TOK_LB ctl_expr TOK_UNTIL ctl_expr TOK_RB
-                                     { $$ = new_lined_node(NODEMGR, EAU, $2, new_lined_node(NODEMGR, EU, $4, $6, $1), $1); }
+                                     { $$ = new_lined_node(NODEMGR, EAU, new_lined_node(NODEMGR, EU, $4, $6, $1), $2, $1); }
              | TOK_AAA action_expr TOK_LB ctl_expr TOK_UNTIL ctl_expr TOK_RB
-                                     { $$ = new_lined_node(NODEMGR, AAU, $2, new_lined_node(NODEMGR, EU, $4, $6, $1), $1); }
+                                     { $$ = new_lined_node(NODEMGR, AAU, new_lined_node(NODEMGR, EU, $4, $6, $1), $2, $1); }
              | TOK_EBF subrange ctl_expr { $$ = new_lined_node(NODEMGR, EBF, $3, $2, $1); }
              | TOK_ABF subrange ctl_expr { $$ = new_lined_node(NODEMGR, ABF, $3, $2, $1); }
              | TOK_EBG subrange ctl_expr { $$ = new_lined_node(NODEMGR, EBG, $3, $2, $1); }
