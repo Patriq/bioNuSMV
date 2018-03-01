@@ -93,6 +93,14 @@ Extend_trace_with_states_inputs_pair(BddFsm_ptr fsm, BddEnc_ptr enc,
                                      bdd_ptr next_states,
                                      const char * comment);
 
+static node_ptr
+Extend_trace_with_constrained_state_input_pair(BddFsm_ptr fsm, BddEnc_ptr enc,
+                                               node_ptr path,
+                                               bdd_ptr starting_state,
+                                               bdd_ptr next_states,
+                                               bdd_ptr si,
+                                               const char * comment);
+
 #ifdef EXPLAIN_TRACE_DEBUG
 static void Check_TraceList_Sanity(BddEnc_ptr enc, node_ptr path,
                                    const char * varname);
@@ -125,7 +133,7 @@ node_ptr explain(BddFsm_ptr fsm, BddEnc_ptr enc,
 /* Definition of internal functions                                         */
 /*--------------------------------------------------------------------------*/
 
-node_ptr ex_explain(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr path, bdd_ptr f)
+node_ptr eax_explain(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr path, bdd_ptr f, bdd_ptr si)
 {
   bdd_ptr acc, starting_state, image;
   DDMgr_ptr dd_manager = BddEnc_get_dd_manager(enc);
@@ -138,7 +146,7 @@ node_ptr ex_explain(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr path, bdd_ptr f)
 
   starting_state = bdd_dup((bdd_ptr) car(path));
   nusmv_assert( BddFsm_is_fair_states(fsm, starting_state) );
-  image = BddFsm_get_forward_image(fsm, starting_state);
+  image = BddFsm_get_constrained_forward_image(fsm, starting_state, si);
 
   acc = bdd_dup(f);
 
@@ -156,14 +164,21 @@ node_ptr ex_explain(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr path, bdd_ptr f)
     path = Nil;
   }
   else {
-    path = Extend_trace_with_state_input_pair(fsm, enc, path, starting_state,
-                                              acc, "ex_explain: (1).");
+    path = Extend_trace_with_constrained_state_input_pair(fsm, enc, path, starting_state, acc, si, "ex_explain: (1).");
   }
 
   bdd_free(dd_manager, starting_state);
   bdd_free(dd_manager, acc);
 
   return path;
+}
+
+node_ptr ex_explain(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr path, bdd_ptr f)
+{
+  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
+  const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
+  bdd_ptr si = eval_ctl_spec(fsm, enc, ExprMgr_true(exprs), Nil);
+  return eax_explain(fsm, enc, path, f, si);
 }
 
 node_ptr eu_si_explain(BddFsm_ptr fsm, BddEnc_ptr enc,
@@ -1230,11 +1245,12 @@ static node_ptr explain_recur(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr path,
 
     case EAX:
     {
-      // So far its the same as EX.
       a1 = eval_ctl_spec(fsm, enc, car(formula_expr), context);
+      a2 = eval_ctl_spec(fsm, enc, cdr(formula_expr), context);
       ErrorMgr_set_the_node(errmgr, formula_expr);
-      new_path = ex_explain(fsm, enc, path, a1);
+      new_path = eax_explain(fsm, enc, path, a1, a2);
       bdd_free(dd_manager, a1);
+      bdd_free(dd_manager, a2);
       if (new_path != Nil) {
         node_ptr q = explain_recur(fsm, enc, new_path, car(formula_expr),
                                    context);
@@ -1859,4 +1875,46 @@ mc_explain_debug_check_not_empty_state(BddFsm_ptr fsm, BddEnc_ptr enc,
   else {
     bdd_free(dd_manager, tmp);
   }
+}
+
+static node_ptr Extend_trace_with_constrained_state_input_pair(BddFsm_ptr fsm,
+                                                               BddEnc_ptr enc,
+                                                               node_ptr path,
+                                                               bdd_ptr starting_state,
+                                                               bdd_ptr next_states,
+                                                               bdd_ptr si,
+                                                               const char * comment) {
+  node_ptr res;
+  bdd_ptr next_state, inputs, input;
+  size_t size = strlen(comment) + 10;
+  char * com = ALLOC(char, size);
+  DDMgr_ptr dd_manager = BddEnc_get_dd_manager(enc);
+  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
+  const NodeMgr_ptr nodemgr =
+      NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+
+  snprintf(com, size, "%s: (%d)", com, 1);
+
+#ifdef EXPLAIN_TRACE_DEBUG
+  Check_TraceList_Sanity(enc, path, com);
+#endif
+
+  next_state = BddEnc_pick_one_state(enc, next_states);
+  inputs = BddFsm_states_to_states_get_inputs(fsm, starting_state, next_state);
+  bdd_and_accumulate(dd_manager, &inputs, si);
+  input = BddEnc_pick_one_input(enc, inputs);
+
+  res = cons(nodemgr, (node_ptr) bdd_dup(next_state), cons(nodemgr, (node_ptr) bdd_dup(input), path));
+
+  snprintf(com, size, "%s: (%d)", com, 2);
+
+#ifdef EXPLAIN_TRACE_DEBUG
+  Check_TraceList_Sanity(enc, res, com);
+#endif
+
+  bdd_free(dd_manager, input);
+  bdd_free(dd_manager, inputs);
+  bdd_free(dd_manager, next_state);
+
+  return res;
 }

@@ -78,6 +78,10 @@ Mc_fair_si_iteration(BddFsm_ptr fsm,
                      bdd_ptr states,
                      bdd_ptr subspace);
 
+static BddStatesInputs
+ex_si_aware(BddFsm_ptr fsm,
+            BddStatesInputs si);
+
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
@@ -329,42 +333,17 @@ BddStates ex(BddFsm_ptr fsm, BddStates g)
 }
 
 BddStates eax(BddFsm_ptr fsm, BddStates f, BddStates act) {
-  // So far same as ex
   DDMgr_ptr dd = BddEnc_get_dd_manager(BddFsm_get_bdd_encoding(fsm));
-  NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(dd));
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  bdd_ptr result;
-  bdd_ptr tmp = bdd_dup(f);
+  bdd_ptr tmp_1, result;
 
-  {
-    /*
-       The explicit restriction to fair states is required (it affects
-       the result from a logical point of view.)
-    */
-    bdd_ptr fair_states_bdd = BddFsm_get_fair_states(fsm);
+  tmp_1 = bdd_and(dd, f, act);
+  result = ex_si_aware(fsm, tmp_1);
+  result = BddFsm_states_inputs_to_states(fsm, result);
 
-    bdd_and_accumulate(dd, &tmp, fair_states_bdd);
-    bdd_free(dd, fair_states_bdd);
-  }
+  bdd_free(dd, tmp_1);
 
-  if (opt_use_reachable_states(opts)) {
-    bdd_ptr reachable_states_bdd =  BddFsm_get_reachable_states(fsm);
-    bdd_and_accumulate(dd, &tmp, reachable_states_bdd);
-    bdd_free(dd, reachable_states_bdd);
-  }
-
-  result = BddFsm_get_backward_image(fsm, tmp);
-  bdd_free(dd, tmp);
-
-  if (opt_use_reachable_states(opts)) {
-    bdd_ptr reachable_states_bdd =  BddFsm_get_reachable_states(fsm);
-    bdd_and_accumulate(dd, &result, reachable_states_bdd);
-    bdd_free(dd, reachable_states_bdd);
-  }
-
-  return(result);
+  return (result);
 }
 
 BddStates eau(BddFsm_ptr fsm, BddStates f, BddStates g, BddStates act) {
@@ -691,6 +670,63 @@ BddStatesInputs ex_si(BddFsm_ptr fsm, BddStatesInputs si)
   bdd_free(dd, states);
 
   return si_preimage;
+}
+
+/*!
+  \brief Set of states satisfying <i>EX(g)</i>.
+
+  Computes the set of states satisfying <i>EX(g)</i>,
+   keeping the input variables.
+
+  \sa eu ex ef
+*/
+BddStates ex_si_aware(BddFsm_ptr fsm, BddStates si) {
+  BddEnc_ptr enc = BddFsm_get_bdd_encoding(fsm);
+  DDMgr_ptr dd = BddEnc_get_dd_manager(enc);
+  NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(dd));
+  const OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+
+  bdd_ptr result;
+  BddStates states;
+  BddInputs inputs;
+
+  bdd_ptr tmp = bdd_dup(si);
+
+  {
+    /*
+     The explicit restriction to fair states is required (it affects
+     the result from a logical point of view.)
+     */
+    bdd_ptr fair_states_bdd = BddFsm_get_fair_states(fsm);
+
+    bdd_and_accumulate(dd, &tmp, fair_states_bdd);
+    bdd_free(dd, fair_states_bdd);
+  }
+
+  if (opt_use_reachable_states(opts)) {
+    bdd_ptr reachable_states_bdd = BddFsm_get_reachable_states(fsm);
+    bdd_and_accumulate(dd, &tmp, reachable_states_bdd);
+    bdd_free(dd, reachable_states_bdd);
+  }
+
+  //Separate input variables
+  states = BddFsm_states_inputs_to_states(fsm, tmp);
+  inputs = BddFsm_states_inputs_to_inputs(fsm, tmp);
+
+  result = BddFsm_get_constrained_backward_image(fsm, states, inputs);
+
+  bdd_free(dd, tmp);
+  bdd_free(dd, states);
+  bdd_free(dd, inputs);
+
+  if (opt_use_reachable_states(opts)) {
+    bdd_ptr reachable_states_bdd = BddFsm_get_reachable_states(fsm);
+    bdd_and_accumulate(dd, &result, reachable_states_bdd);
+    bdd_free(dd, reachable_states_bdd);
+  }
+
+  return (result);
 }
 
 BddStatesInputs eu_si(BddFsm_ptr fsm, bdd_ptr f, bdd_ptr g)
