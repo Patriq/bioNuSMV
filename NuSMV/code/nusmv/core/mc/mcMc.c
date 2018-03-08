@@ -337,7 +337,7 @@ BddStates eax(BddFsm_ptr fsm, BddStates f, BddStates act) {
 
   bdd_ptr tmp_1, result;
 
-  tmp_1 = bdd_and(dd, f, act);
+  tmp_1 = bdd_and(dd, act, f);
   result = ex_si_aware(fsm, tmp_1);
   result = BddFsm_states_inputs_to_states(fsm, result);
 
@@ -347,80 +347,24 @@ BddStates eax(BddFsm_ptr fsm, BddStates f, BddStates act) {
 }
 
 BddStates eau(BddFsm_ptr fsm, BddStates f, BddStates g, BddStates act) {
-  // So far same as eu
   BddEnc_ptr enc = BddFsm_get_bdd_encoding(fsm);
   DDMgr_ptr dd = BddEnc_get_dd_manager(enc);
-  NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(dd));
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
-  const MasterPrinter_ptr wffprint = MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-  bdd_ptr new, oldY;
-  bdd_ptr Y = bdd_dup(g);
-  int n = 1;
+  bdd_ptr tmp_1, tmp_2, tmp_3, result;
 
-  /* The following simplification may be useful for efficiency since g
-     may be unreachable (but they are not fundamental for correctness
-     similar simplifications are applied in ex). */
+  tmp_1 = bdd_and(dd, act, f);
+  tmp_2 = bdd_and(dd, act, g);
 
-  {
-    bdd_ptr fair_states_bdd = BddFsm_get_fair_states(fsm);
+  tmp_3 = ex_si_aware(fsm, eu_si(fsm, tmp_1, tmp_2));
 
-    bdd_and_accumulate(dd, &Y, fair_states_bdd);
-    bdd_free(dd, fair_states_bdd);
-  }
+  result = bdd_or(dd, g, bdd_and(dd, f, tmp_3));
+  result = BddFsm_states_inputs_to_states(fsm, result);
 
-  if (opt_use_reachable_states(opts)) {
-    bdd_ptr reachable_states_bdd = BddFsm_get_reachable_states(fsm);
-    bdd_and_accumulate(dd, &Y, reachable_states_bdd);
-    bdd_free(dd, reachable_states_bdd);
-  }
+  bdd_free(dd, tmp_1);
+  bdd_free(dd, tmp_2);
+  bdd_free(dd, tmp_3);
 
-  if (opt_verbose_level_gt(opts, 1)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_nlog(logger, wffprint,
-                "eu: computing fixed point approximations for %N ...\n",
-                ErrorMgr_get_the_node(errmgr));
-  }
-
-  oldY = bdd_dup(Y);
-  new = bdd_dup(Y);
-  while(bdd_isnot_false(dd, new)) {
-    bdd_ptr tmp_1, tmp_2;
-
-    if (opt_verbose_level_gt(opts, 1)) {
-      Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-      double states = BddEnc_count_states_of_bdd(enc, Y);
-      int size = bdd_size(dd, Y);
-
-      Logger_log(logger, "size of Y%d = %g states, %d BDD nodes\n",
-                 n++, states, size);
-
-    }
-    bdd_free(dd, oldY);
-    oldY = bdd_dup(Y);
-
-    tmp_1 = ex(fsm, new);
-
-    tmp_2 = bdd_and(dd, f, tmp_1);
-
-    bdd_free(dd, tmp_1);
-    bdd_or_accumulate(dd, &Y, tmp_2);
-
-    bdd_free(dd, tmp_2);
-    tmp_1 = bdd_not(dd, oldY);
-
-    bdd_free(dd, new);
-    new = bdd_and(dd, Y, tmp_1);
-
-    bdd_free(dd, tmp_1);
-  }
-  bdd_free(dd, new);
-  bdd_free(dd, oldY);
-
-  return(Y);
+  return (result);
 }
 
 BddStates aax(BddFsm_ptr fsm, BddStates f, BddStates act) {

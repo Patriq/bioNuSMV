@@ -64,14 +64,6 @@ extern TraceMgr_ptr global_trace_manager;
 
 /*!
   \brief This function computes a path that is a witness
-   for <i>EAX(f)</i>.
-
-  \sa explain
-*/
-node_ptr eax_explain(BddFsm_ptr, BddEnc_ptr, node_ptr, bdd_ptr, bdd_ptr);
-
-/*!
-  \brief This function computes a path that is a witness
    for <i>EX(f)</i>.
 
   This function finds a path that is a witness for
@@ -91,6 +83,14 @@ node_ptr eax_explain(BddFsm_ptr, BddEnc_ptr, node_ptr, bdd_ptr, bdd_ptr);
   \sa explain
 */
 node_ptr ex_explain(BddFsm_ptr, BddEnc_ptr, node_ptr, bdd_ptr);
+
+/*!
+  \brief This function computes a path that is a witness
+   for <i>EAX(f)</i>.
+
+  \sa explain
+*/
+node_ptr eax_explain(BddFsm_ptr, BddEnc_ptr, node_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief This function finds a path that is a witness
@@ -116,6 +116,14 @@ node_ptr ex_explain(BddFsm_ptr, BddEnc_ptr, node_ptr, bdd_ptr);
 */
 node_ptr eu_explain(BddFsm_ptr, BddEnc_ptr,
                            node_ptr, bdd_ptr, bdd_ptr);
+
+/*!
+  \brief This function computes a path that is a witness
+   for <i>EAU(f)</i>.
+
+  \sa explain
+*/
+node_ptr eau_explain(BddFsm_ptr, BddEnc_ptr, node_ptr, bdd_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief This function finds a path that is a witness
