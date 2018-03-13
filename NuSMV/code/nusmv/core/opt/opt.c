@@ -1688,6 +1688,23 @@ char* get_print_accepting(OptsHandler_ptr opt)
   return OptsHandler_get_string_option_value(opt, PRINT_ACCEPTING);
 }
 
+/******************************************************************************/
+/* CTL_FOR_ALL_INIT */
+
+void set_ctl_for_all_init(OptsHandler_ptr opt)
+{
+  boolean res = OptsHandler_set_bool_option_value(opt, CTL_FOR_ALL_INIT, true);
+  nusmv_assert(res);
+}
+void unset_ctl_for_all_init(OptsHandler_ptr opt)
+{
+  boolean res = OptsHandler_set_bool_option_value(opt, CTL_FOR_ALL_INIT, false);
+  nusmv_assert(res);
+}
+boolean opt_ctl_for_all_init(OptsHandler_ptr opt)
+{
+  return OptsHandler_get_bool_option_value(opt, CTL_FOR_ALL_INIT);
+}
 
 /******************************************************************************/
 /* BOOLEAN_CONVERSION_USES_PREDICATE_NORMALIZATION */

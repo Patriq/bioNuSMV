@@ -637,7 +637,11 @@ void Opt_Pkg_init(NuSMVEnv_ptr const env)
    /* register command line option -a */  
   res = OptsHandler_register_generic_option(opts, PRINT_ACCEPTING, DEFAULT_PRINT_ACCEPTING, true);
   nusmv_assert(res);
-  
+
+  /* Register command line option -ctlei */
+  res = OptsHandler_register_bool_option(opts, CTL_FOR_ALL_INIT, true, true);
+  nusmv_assert(res);
+
 }
 
 void Opt_Pkg_deinit(NuSMVEnv_ptr const env)

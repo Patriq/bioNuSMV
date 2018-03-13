@@ -912,6 +912,13 @@ typedef enum {
 
 #define DEFAULT_PRINT_ACCEPTING (char *)NULL
 
+/*!
+ \brief \todo Missing synopsis
+
+ \todo Missing description
+*/
+#define CTL_FOR_ALL_INIT "ctl_for_all_init"
+
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -2599,5 +2606,25 @@ void    reset_print_accepting(OptsHandler_ptr);
 */
 char* get_print_accepting(OptsHandler_ptr opt);
 
+/*!
+  \brief \todo Missing synopsis
+
+  \todo Missing description
+*/
+void set_ctl_for_all_init(OptsHandler_ptr opt);
+
+/*!
+  \brief \todo Missing synopsis
+
+  \todo Missing description
+*/
+void unset_ctl_for_all_init(OptsHandler_ptr opt);
+
+/*!
+  \brief \todo Missing synopsis
+
+  \todo Missing description
+*/
+boolean opt_ctl_for_all_init(OptsHandler_ptr opt);
 
 #endif /* __NUSMV_CORE_OPT_OPT_H__ */

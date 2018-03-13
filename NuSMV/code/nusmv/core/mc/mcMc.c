@@ -97,7 +97,7 @@ void Mc_CheckCTLSpec(NuSMVEnv_ptr env, Prop_ptr prop)
   Trace_ptr trace;
   
   /* ADDED bdd_ptr for accepting and initial states */
-  bdd_ptr s0, tmp_1, tmp_2, accepted, init;
+  bdd_ptr s0, tmp_1, tmp_2, accepted, init, ss0;
   
   BddFsm_ptr fsm;
   BddEnc_ptr enc;
@@ -124,7 +124,22 @@ void Mc_CheckCTLSpec(NuSMVEnv_ptr env, Prop_ptr prop)
   
   /* ADDED: save accepting states */
   if(get_print_accepting(opts) != NULL)
-    accepted = bdd_dup(s0);  
+    accepted = bdd_dup(s0);
+
+  /* Check for ctlei flag */
+  if (!opt_ctl_for_all_init(opts)) {
+    bdd_ptr fs = BddFsm_get_fair_states(fsm);
+    bdd_ptr is = BddFsm_get_init(fsm);
+
+    ss0 = BddFsm_get_state_constraints(fsm);
+    bdd_and_accumulate(dd, &ss0, s0);
+    bdd_and_accumulate(dd, &ss0, fs);
+    bdd_and_accumulate(dd, &ss0, is);
+    bdd_free(dd, fs);
+    bdd_free(dd, is);
+    /* This point ss0 is the intersection of initial states with the
+       denotation of the CTL formula */
+  }
   
   tmp_1 = bdd_not(dd, s0);
   tmp_2 = BddFsm_get_state_constraints(fsm);
@@ -147,9 +162,10 @@ void Mc_CheckCTLSpec(NuSMVEnv_ptr env, Prop_ptr prop)
   print_spec(StreamMgr_get_output_ostream(streams),
              prop, get_prop_print_method(opts));
 
-  if (bdd_is_false(dd, s0)) {
+  if ((opt_ctl_for_all_init(opts) && bdd_is_false(dd, s0)) || (!opt_ctl_for_all_init(opts) && bdd_isnot_false(dd, ss0))) {
     StreamMgr_print_output(streams,  "is true\n");
     Prop_set_status(prop, Prop_True);
+    if (!opt_ctl_for_all_init(opts)) bdd_free(dd, ss0);
   }
   else {
     StreamMgr_print_output(streams,  "is false\n");
@@ -198,7 +214,7 @@ void Mc_CheckCTLSpec(NuSMVEnv_ptr env, Prop_ptr prop)
 
       FREE(trace_title);
 
-      StreamMgr_print_output(streams, 
+      StreamMgr_print_output(streams,
               "-- as demonstrated by the following execution sequence\n");
 
       TraceMgr_register_trace(TRACE_MGR(NuSMVEnv_get_value(env, ENV_TRACE_MGR)), trace);
@@ -212,8 +228,8 @@ void Mc_CheckCTLSpec(NuSMVEnv_ptr env, Prop_ptr prop)
       free_list(nodemgr, exp);
     }
   }
-    
-  /* ADDED: prints out accepting states, initial states 
+
+  /* ADDED: prints out accepting states, initial states
    * and initial accepting states as additional information 
    * if commandline parameter "-a interesting_states" is set */
   if(get_print_accepting(opts) != NULL) {

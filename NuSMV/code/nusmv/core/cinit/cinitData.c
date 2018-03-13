@@ -773,6 +773,12 @@ void NuSMVCore_init_cmd_options(NuSMVEnv_ptr env)
 					"filename", PRINT_ACCEPTING, true,
 					false, NULL, NULL);
 
+  NuSMVCore_add_env_command_line_option("-ctlei",
+          "interpret CTL as there exists an init state "
+          "(default is forall init state)",
+          NULL, CTL_FOR_ALL_INIT, true,
+          false, NULL, NULL);
+
   FREE(libraryName);
 }
 
