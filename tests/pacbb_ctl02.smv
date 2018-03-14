@@ -1,0 +1,7 @@
+INIT s1101;
+SPEC EX s0101; -- true
+SPEC EX s1111; -- true
+SPEC EX s1001; -- true
+SPEC AX s1111; -- false
+SPEC EF (s0111 & AG s0111); -- true
+
