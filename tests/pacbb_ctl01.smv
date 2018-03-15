@@ -1,0 +1,7 @@
+INIT s0000;
+SPEC  EX !s0000; -- false
+SPEC !EX  s0000; -- false
+SPEC  EX  s0000; -- true
+SPEC  AX  s0000; -- true
+SPEC AG s0000; -- true
+

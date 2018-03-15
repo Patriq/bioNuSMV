@@ -1,0 +1,7 @@
+INIT s011;
+SPEC EX s111; -- false (strong SS)
+SPEC EX s001; -- false
+SPEC EX s010; -- false
+SPEC AX s011; -- true
+SPEC AG s011; -- true
+

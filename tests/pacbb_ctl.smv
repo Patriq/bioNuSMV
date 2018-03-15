@@ -1,0 +1,129 @@
+-- March 2, 2018 6:03:38 PM WET
+--
+-- NuSMV implicit representation of a logical model exported by GINsim
+--
+-- Requires NuSMV v2.1+ for CTL properties
+--
+-- Requires NuSMV-ARCTL for ARCTL properties
+-- http://lvl.info.ucl.ac.be/Tools/NuSMV-ARCTL-TLACE
+
+MODULE main
+
+IVAR
+-- Simulation mode declaration --
+-- Asynchronous
+  PCs : { PC_c1, PC_c2, PC_c3 };
+  PC_c1_vars : { PC_c1_G1 };
+  PC_c2_vars : { PC_c2_G2 };
+  PC_c3_vars : { PC_c3_G3 };
+
+VAR
+
+-- State variables declaration
+  G1 : {0, 1};
+  G2 : {0, 1};
+  G3 : {0, 1};
+
+-- Input variables declaration
+  G4 : { 0, 1};
+
+ASSIGN
+-- Variable update if conditions are met
+next(G1) := 
+  case
+    update_G1_OK & (G1_inc) : 1;
+    update_G1_OK & (G1_dec) : 0;
+    TRUE : G1;
+  esac;
+next(G2) := 
+  case
+    update_G2_OK & (G2_inc) : 1;
+    update_G2_OK & (G2_dec) : 0;
+    TRUE : G2;
+  esac;
+next(G3) := 
+  case
+    update_G3_OK & (G3_inc) : 1;
+    update_G3_OK & (G3_dec) : 0;
+    TRUE : G3;
+  esac;
+--next(G4) := G4;
+
+DEFINE
+-- Variable next level regulation
+G1_focal :=
+  case
+    (G2 = 0) & (G4 = 1) : 1;
+    TRUE : 0;
+  esac;
+G2_focal :=
+  case
+    (G1 = 0) & (G3 = 1) : 1;
+    TRUE : 0;
+  esac;
+G3_focal :=
+  case
+    (G2 = 0) & (G4 = 1) : 1;
+    (G2 = 1) : 1;
+    TRUE : 0;
+  esac;
+
+G1_inc := G1_focal > G1;
+G1_dec := G1_focal < G1;
+G1_std := G1_focal = G1;
+
+G2_inc := G2_focal > G2;
+G2_dec := G2_focal < G2;
+G2_std := G2_focal = G2;
+
+G3_inc := G3_focal > G3;
+G3_dec := G3_focal < G3;
+G3_std := G3_focal = G3;
+
+update_G1_OK := (PCs = PC_c1) & (PC_c1_vars = PC_c1_G1);
+update_G2_OK := (PCs = PC_c2) & (PC_c2_vars = PC_c2_G2);
+update_G3_OK := (PCs = PC_c3) & (PC_c3_vars = PC_c3_G3);
+
+-- DISCLAIMER: There are no INput nor OUTput variables in the weak/strong stable states description
+stableStates := weakSS | strongSS;
+
+-- ATTENTION: This export does not include the stable states enumeration
+weakSS := FALSE;
+strongSS := FALSE;
+
+-- Declaration of output variables
+-- Empty !
+
+-- Authorized NuSMV transitions
+TRANS
+next(G1) != G1 |
+next(G2) != G2 |
+next(G3) != G3 |
+(G1_std & G2_std & G3_std); -- or it is a steady state
+
+DEFINE
+s0000:= G1=0 & G2=0 & G3=0 & G4=0;
+s0001:= G1=0 & G2=0 & G3=0 & G4=1;
+s0010:= G1=0 & G2=0 & G3=1 & G4=0;
+s0011:= G1=0 & G2=0 & G3=1 & G4=1;
+s0100:= G1=0 & G2=1 & G3=0 & G4=0;
+s0101:= G1=0 & G2=1 & G3=0 & G4=1;
+s0110:= G1=0 & G2=1 & G3=1 & G4=0;
+s0111:= G1=0 & G2=1 & G3=1 & G4=1;
+s1000:= G1=1 & G2=0 & G3=0 & G4=0;
+s1001:= G1=1 & G2=0 & G3=0 & G4=1;
+s1010:= G1=1 & G2=0 & G3=1 & G4=0;
+s1011:= G1=1 & G2=0 & G3=1 & G4=1;
+s1100:= G1=1 & G2=1 & G3=0 & G4=0;
+s1101:= G1=1 & G2=1 & G3=0 & G4=1;
+s1110:= G1=1 & G2=1 & G3=1 & G4=0;
+s1111:= G1=1 & G2=1 & G3=1 & G4=1;
+s000:= G1=0 & G2=0 & G3=0;
+s001:= G1=0 & G2=0 & G3=1;
+s010:= G1=0 & G2=1 & G3=0;
+s011:= G1=0 & G2=1 & G3=1;
+s100:= G1=1 & G2=0 & G3=0;
+s101:= G1=1 & G2=0 & G3=1;
+s110:= G1=1 & G2=1 & G3=0;
+s111:= G1=1 & G2=1 & G3=1;
+

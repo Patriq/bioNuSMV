@@ -1,0 +1,4 @@
+INIT s000;
+SPEC EX s000; -- true (weak SS)
+SPEC AX s000; -- false
+

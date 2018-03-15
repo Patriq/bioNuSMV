@@ -1,0 +1,6 @@
+INIT s100;
+SPEC EX s100; -- false
+SPEC EX s000; -- true
+SPEC EAX (G4=1) (s000); -- false
+SPEC EAX (G4=0) (s000); -- true
+
