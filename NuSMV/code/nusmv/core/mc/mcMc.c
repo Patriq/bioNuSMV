@@ -438,33 +438,38 @@ BddStates eaf(BddFsm_ptr fsm, BddStates f, BddStates act) {
 }
 
 BddStates eag(BddFsm_ptr fsm, BddStates f, BddStates act) {
-  // EAG[ act, g ] = EAU[ act, g, g & !EAX[ act, true]] | !EG_SI[act, g]
-  //                           |
-  //                           |   Is it the same?!? The above was in the mcMc.c of arctl-orig
-  //                           V
-  // EAG(action)(ctl_expr) = EAU(action)[g U g & !EAX(action)(true)] | !EG_SI[action, g]
-  // So far same as eg
+  // EAG(action)(ctl_expr) = EAU(action)[ctl_expr U ctl_expr & !EAX(action)(true)] | !EG_SI[action, ctl_expr]
   DDMgr_ptr dd = BddEnc_get_dd_manager(BddFsm_get_bdd_encoding(fsm));
-  bdd_ptr fair_transitions;
-  bdd_ptr fair_transitions_g;
-  bdd_ptr res_si;
-  bdd_ptr res;
 
-  /* Lazy evaluation for the case 'EG True' */
-  if (bdd_is_true(dd, f)) return BddFsm_get_fair_states(fsm);
+  bdd_ptr tmp_1, tmp_2, tmp_3, tmp_4;
+  bdd_ptr eaxt, neaxt, eaup, paneaxt, one, result;
 
-  fair_transitions = BddFsm_get_fair_states_inputs(fsm);
-  fair_transitions_g = bdd_and(dd, fair_transitions, f);
+  tmp_1 = bdd_and(dd, act, f);
 
-  res_si = eg_si(fsm, fair_transitions_g);
+  tmp_2 = ex_si_aware(fsm, eg_si(fsm, tmp_1));
 
-  res = BddFsm_states_inputs_to_states(fsm, res_si);
+  tmp_3 = bdd_and(dd, f, tmp_2);
+  tmp_4 = BddFsm_states_inputs_to_states(fsm, tmp_3);
 
-  bdd_free(dd, res_si);
-  bdd_free(dd, fair_transitions_g);
-  bdd_free(dd, fair_transitions);
+  one = bdd_true(dd);
+  eaxt = eax(fsm, one, act);
+  neaxt = bdd_not(dd, eaxt);
+  paneaxt = bdd_and(dd, neaxt, f);
+  eaup = eau(fsm, f, paneaxt, act);
 
-  return(res);
+  result = bdd_or(dd, eaup, tmp_4);
+
+  bdd_free(dd, tmp_1);
+  bdd_free(dd, tmp_2);
+  bdd_free(dd, tmp_3);
+  bdd_free(dd, tmp_4);
+  bdd_free(dd, one);
+  bdd_free(dd, eaxt);
+  bdd_free(dd, neaxt);
+  bdd_free(dd, paneaxt);
+  bdd_free(dd, eaup);
+
+  return (result);
 }
 
 BddStates eu(BddFsm_ptr fsm, BddStates f, BddStates g)

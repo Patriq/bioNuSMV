@@ -508,6 +508,56 @@ node_ptr eg_explain(BddFsm_ptr fsm, BddEnc_ptr enc,
   return witness_path;
 }
 
+node_ptr eag_explain(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr path, bdd_ptr f, bdd_ptr a) {
+  DDMgr_ptr dd_manager = BddEnc_get_dd_manager(enc);
+  node_ptr new_path;
+  bdd_ptr eagf, eaxs;
+
+  f = bdd_dup(f);
+  a = bdd_dup(a);
+
+  if (path == Nil) {
+    return Nil;
+  }
+
+  eagf = eag(fsm, f, a);
+
+  /* If car(path) is not in EaG f, then no witness can be constructed */
+  if (bdd_entailed(dd_manager, (bdd_ptr) car(path), eagf) == 0) {
+    bdd_free(dd_manager, eagf);
+    return Nil;
+  }
+
+  while (true) {
+    eaxs = eax(fsm, a, (bdd_ptr) car(path));
+    bdd_and_accumulate(dd_manager, &eaxs, eagf);
+
+    new_path = eau_explain(fsm, enc, path, eagf, eaxs, a);
+    new_path = eax_explain(fsm, enc, new_path, (bdd_ptr) car(path), a);
+
+    bdd_free(dd_manager, eaxs);
+
+    if (new_path != Nil) {
+      break;
+    }
+
+    new_path = eax_explain(fsm, enc, path, eagf, a);
+
+    if (new_path == Nil) {
+      bdd_free(dd_manager, eagf);
+      bdd_free(dd_manager, f);
+      bdd_free(dd_manager, a);
+      return path;
+    }
+    path = new_path;
+  }
+
+  bdd_free(dd_manager, eagf);
+  bdd_free(dd_manager, f);
+  bdd_free(dd_manager, a);
+  return new_path;
+}
+
 node_ptr ebu_explain(BddFsm_ptr fsm, BddEnc_ptr enc,
                      node_ptr path, bdd_ptr f, bdd_ptr g,
                      int inf, int sup)
@@ -1360,16 +1410,13 @@ static node_ptr explain_recur(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr path,
 
     case EAG:
     {
-      // EAG[ act, g ] = EAU[ act, g, g & !EAX[ act, true]] | !EG_SI[act, g]
-      //                           |
-      //                           |   Is it the same?!? The above was in the mcMc.c of arctl-orig
-      //                           V
-      // EAG(action)(ctl_expr) = EAU(action)[g U g & !EAX(action)(true)] | !EG_SI[action, g]
-      // So far same as EG
+      // EAG(action)(ctl_expr) = EAU(action)[ctl_expr U ctl_expr & !EAX(action)(true)] | !EG_SI[action, ctl_expr]
       a1 = eval_ctl_spec(fsm, enc, car(formula_expr), context);
+      a2 = eval_ctl_spec(fsm, enc, cdr(formula_expr), context);
       ErrorMgr_set_the_node(errmgr, formula_expr);
-      new_path = eg_explain(fsm, enc, path, a1);
+      new_path = eag_explain(fsm, enc, path, a1, a2);
       bdd_free(dd_manager, a1);
+      bdd_free(dd_manager, a2);
       return new_path;
     }
 

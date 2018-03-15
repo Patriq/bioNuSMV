@@ -209,6 +209,21 @@ ebu_explain(BddFsm_ptr, BddEnc_ptr, node_ptr, bdd_ptr,
 node_ptr eg_explain(BddFsm_ptr, BddEnc_ptr, node_ptr, bdd_ptr);
 
 /*!
+  \brief This function finds a path that is an example
+   for <i>EAG(a,f)</i>.
+
+  This function finds a path that is an example for
+    <i>EAG(a,f)</i>. The first element <code>p</code> is the BDD that
+    represents the first state of the path. It is an initial state from
+    which the example can be found.<br>
+
+    This function doesn't take fairness constraints into account.
+
+  \sa explain
+*/
+node_ptr eag_explain(BddFsm_ptr, BddEnc_ptr, node_ptr, bdd_ptr, bdd_ptr);
+
+/*!
   \brief This function finds a path of length
    <tt>(sup-inf)</tt> that is an example for
    <i>EG(g)^{sup}_{inf}</i>.
