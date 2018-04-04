@@ -194,8 +194,8 @@ int CommandCheckCtlSpec(NuSMVEnv_ptr env, int argc, char** argv)
     ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   util_getopt_reset();
   reset_print_accepting(opts);
-  /* ADDED: option a */
-  while ((c = util_getopt(argc,argv,"hamo:n:p:P:")) != EOF) {
+  /* ADDED: option a and e */
+  while ((c = util_getopt(argc,argv,"haemo:n:p:P:")) != EOF) {
     switch (c) {
     case 'h': return UsageCheckCtlSpec(env);
     /* ADDED: case for option 'a' */
@@ -204,6 +204,12 @@ int CommandCheckCtlSpec(NuSMVEnv_ptr env, int argc, char** argv)
        set_print_accepting(opts, "print");
        break;
       }
+    /* ADDED: case for option ctlei */
+    case 'e':
+     {
+       unset_ctl_for_all_init(opts);
+       break;
+     }
     case 'n':
       {
         if (formula != NIL(char)) return UsageCheckCtlSpec(env);
@@ -341,11 +347,13 @@ static int UsageCheckCtlSpec(const NuSMVEnv_ptr env)
 {
   StreamMgr_ptr streams = STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   /* ADDED: command line option a for printing initial states, accepting states, initial accepting states */
-  StreamMgr_print_error(streams,  "usage: check_ctlspec [-h] [-a] [-m | -o file] [-n number | -p \"ctl-expr\" | -P \"name\"]\n");
+  /* ADDED: command line option option ctlei as 'e' */
+  StreamMgr_print_error(streams,  "usage: check_ctlspec [-h] [-a] [-e] [-m | -o file] [-n number | -p \"ctl-expr\" | -P \"name\"]\n");
   StreamMgr_print_error(streams,  "   -h \t\t\tPrints the command usage.\n");
-  StreamMgr_print_error(streams,  "   -a \t\t\tPrints a factored form formula of the accepting\n"); 
+  StreamMgr_print_error(streams,  "   -a \t\t\tPrints a factored form formula of the accepting\n");
   StreamMgr_print_error(streams,  "      \t\t\tstates to the file output-file specified with option -o \n");
   StreamMgr_print_error(streams,  "      \t\t\tor to the command line, if option -m is selected.\n");
+  StreamMgr_print_error(streams,  "   -e \t\t\tInterprets CTL as there exists an init state (default is forall init state)\n");
   StreamMgr_print_error(streams,  "   -m \t\t\tPipes output through the program specified\n");
   StreamMgr_print_error(streams,  "      \t\t\tby the \"PAGER\" environment variable if defined,\n");
   StreamMgr_print_error(streams,  "      \t\t\telse through the UNIX command \"more\".\n");
