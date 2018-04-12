@@ -1507,6 +1507,7 @@ node_ptr flattener_core_flatten(FlattenerBase_ptr self,
     }
 
     /* CTL Unary operators */
+  case EXISTS_INIT:
   case EX:
   case AX:
   case EF:

@@ -942,6 +942,7 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
 
     /* boolean unary expression or boolean binary expressions those
        right child can be ignored and which have not to be optimized */
+  case EXISTS_INIT:
   case EAX: case AAX: case EAF: case AAF: case EAG: case AAG: /* ignores the action */
   case EX: case AX: case EF: case AF: case EG: case AG:
   case OP_NEXT: case OP_PREC: case OP_NOTPRECNOT: case OP_GLOBAL:

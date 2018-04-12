@@ -107,6 +107,7 @@ void Mc_CheckCTLSpec(NuSMVEnv_ptr env, Prop_ptr prop)
     OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   const NodeMgr_ptr nodemgr =
     NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  boolean for_all_init;
   
   if (opt_verbose_level_gt(opts, 0)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
@@ -126,8 +127,10 @@ void Mc_CheckCTLSpec(NuSMVEnv_ptr env, Prop_ptr prop)
   if(get_print_accepting(opts) != NULL)
     accepted = bdd_dup(s0);
 
-  /* Check for ctlei flag */
-  if (!opt_ctl_for_all_init(opts)) {
+  /* Check for ctlei flag or if the EXISTS_INIT symbol exists */
+  // Search for the EXISTS_INIT symbol
+  for_all_init = opt_ctl_for_all_init(opts) || !search_node_type_in_children(spec, EXISTS_INIT);
+  if (!for_all_init) {
     bdd_ptr fs = BddFsm_get_fair_states(fsm);
     bdd_ptr is = BddFsm_get_init(fsm);
 
@@ -162,10 +165,10 @@ void Mc_CheckCTLSpec(NuSMVEnv_ptr env, Prop_ptr prop)
   print_spec(StreamMgr_get_output_ostream(streams),
              prop, get_prop_print_method(opts));
 
-  if ((opt_ctl_for_all_init(opts) && bdd_is_false(dd, s0)) || (!opt_ctl_for_all_init(opts) && bdd_isnot_false(dd, ss0))) {
+  if ((for_all_init && bdd_is_false(dd, s0)) || (!for_all_init && bdd_isnot_false(dd, ss0))) {
     StreamMgr_print_output(streams,  "is true\n");
     Prop_set_status(prop, Prop_True);
-    if (!opt_ctl_for_all_init(opts)) bdd_free(dd, ss0);
+    if (for_all_init) bdd_free(dd, ss0);
   }
   else {
     StreamMgr_print_output(streams,  "is false\n");

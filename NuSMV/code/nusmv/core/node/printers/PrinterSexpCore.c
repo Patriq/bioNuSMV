@@ -682,6 +682,12 @@ int printer_sexp_core_print_node(PrinterBase_ptr self, node_ptr node,
       _PRINT(")");
     break;
 
+  case EXISTS_INIT:
+    result = _PRINT("\n(EXISTS_INIT ") &&
+             _THROW(car(node), 0) &&
+             _PRINT(")");
+      break;
+
   case EX:
     result = _PRINT("\n(EX ") &&
       _THROW(car(node), 0) &&

@@ -308,6 +308,7 @@ dependency_core_get_dependencies(DependencyBase_ptr self,
   case UMINUS:
   case EX:    /* CTL unary Temporal Operators */
   case SMALLINIT:  /* used for init(expr) */
+  case EXISTS_INIT:
   case AX:
   case EF:
   case AF:

@@ -230,6 +230,9 @@ enum NUSMV_CORE_SYMBOLS {
   EAG, /* complete */
   AAG, /* complete */
 
+  /* ctlei symbol */
+  EXISTS_INIT,
+
   NUSMV_EXPR_SYMBOL_LAST,
   /* ---------------------------------------------------------------------- */
 

@@ -57,6 +57,7 @@
 "READ"                  {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_WAREAD);}
 "WRITE"                 {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_WAWRITE);}
 
+"EXISTSINIT"            {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_EXISTS_INIT);}
 "EX"                    {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_EX);}
 "AX"                    {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_AX);}
 "EAX"                   {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_EAX);}

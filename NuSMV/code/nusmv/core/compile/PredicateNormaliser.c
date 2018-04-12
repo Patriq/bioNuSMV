@@ -652,6 +652,7 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
 
     /* unary expression
        or binary expressions those right child has not to be normalized */
+  case EXISTS_INIT:
   case EAX: case AAX: case EAF: case AAF: case EAG: case AAG: /* ignores the action */
   case EX: case AX: case EF: case AF: case EG: case AG:
   case OP_NEXT: case OP_PREC: case OP_NOTPRECNOT: case OP_GLOBAL:
@@ -1183,6 +1184,7 @@ static node_ptr pred_norm_find_node(PredicateNormaliser_ptr self,
   case NUMBER_FRAC: case NUMBER_REAL:
   case NUMBER_EXP:
   case TWODOTS:  case CONCATENATION:
+  case EXISTS_INIT:
   case EAX: case AAX: case EAF: case AAF: case EAG: case AAG:
   case EAU: case AAU:
   case EX: case AX: case EF: case AF: case EG: case AG:
@@ -1629,6 +1631,7 @@ pred_norm_get_predicates_only(const PredicateNormaliser_ptr self,
     /* unary expressions whose operands are boolean */
   case NEXT: case SMALLINIT:
   case NOT:
+  case EXISTS_INIT:
   case EAX: case AAX: case EAF: case AAF: case EAG: case AAG: /* ignores the action */
   case EX: case AX: case EF: case AF: case EG:  case AG:
   case EBF: case ABF: case EBG: case ABG: /* ignore the number..number part */

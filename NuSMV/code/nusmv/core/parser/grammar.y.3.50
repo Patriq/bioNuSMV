@@ -211,6 +211,7 @@ static boolean isCorrectExp(node_ptr exp, enum EXP_KIND expectedKind)
       return isCorrectExp(car(exp), EXP_SIMPLE); /* NEXT cannot contain NEXT */
 
       /* CTL unary expressions */
+    case EXISTS_INIT:
     case EX: case AX: case EF: case AF: case EG: case AG:
     case ABU: case EBU:
     case EBF: case ABF: case EBG: case ABG:

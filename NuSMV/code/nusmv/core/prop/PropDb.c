@@ -1377,6 +1377,7 @@ static boolean are_simple_expr_invar_only_formulae(PropDb_ptr self,
       break;
 
       /* CTL unary Temporal Operators */
+    case EXISTS_INIT:
     case EG:
     case EX:
     case EF:

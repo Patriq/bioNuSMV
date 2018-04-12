@@ -2229,6 +2229,7 @@ Expr_ptr ExprMgr_resolve(const ExprMgr_ptr self, SymbTable_ptr st,
   case SMALLINIT:
 
     /* no simplification in current implementation: */
+  case EXISTS_INIT:
   case EAX:
   case EAU:
   case AAX:
@@ -2784,6 +2785,7 @@ boolean ExprMgr_is_syntax_correct(Expr_ptr exp, ExprKind expectedKind)
     return ExprMgr_is_syntax_correct(car(exp), EXPR_SIMPLE);
 
     /* CTL unary expressions */
+  case EXISTS_INIT:
   case EX: case AX: case EF: case AF: case EG: case AG:
   case ABU: case EBU:
   case EBF: case ABF: case EBG: case ABG:
@@ -3326,6 +3328,7 @@ static Expr_ptr expr_simplify_aux(ExprMgr_ptr self,
   case CONTEXT:
 
     /* no simplification in current implementation: */
+  case EXISTS_INIT:
   case EAX:
   case EAU:
   case AAX:

@@ -431,6 +431,7 @@ static SymbType_ptr checker_core_check_expr(CheckerBase_ptr self,
     } /* case ATOM, DOT */
 
     /*  boolean unary operand */
+  case EXISTS_INIT:
   case EX:
   case AX:
   case EF:
@@ -2466,6 +2467,7 @@ checker_core_viol_handler(CheckerBase_ptr self,
       break;
 
       /* Unary operators */
+    case EXISTS_INIT:
     case CAST_BOOL:
     case CAST_WORD1:
     case CAST_SIGNED:
@@ -2616,6 +2618,7 @@ static void print_operator(CheckerBase_ptr self, FILE* output_stream,
   case AF:    fprintf(output_stream,"AF"); return;
   case EG:    fprintf(output_stream,"EG"); return;
   case AG:    fprintf(output_stream,"AG"); return;
+  case EXISTS_INIT:   fprintf(output_stream,"EXISTS_INIT"); return;
   case OP_GLOBAL:     fprintf(output_stream,"G"); return;
   case OP_HISTORICAL: fprintf(output_stream,"H"); return;
   case RELEASES:      fprintf(output_stream,"V"); return;

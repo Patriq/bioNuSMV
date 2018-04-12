@@ -370,6 +370,15 @@ void setcdr(node_ptr, node_ptr);
 */
 void node_set_type(node_ptr, int);
 
+/*!
+  \brief Searches for a node type in the node's children
+
+  Returns true if the given node type is found in the node's left and right children recursively
+
+  \sa car cdr node_get_type
+*/
+boolean search_node_type_in_children(node_ptr, int);
+
 /* Node Types interface *******************************************************/
 
 /*!

@@ -737,6 +737,7 @@ formulaGetDependenciesRecur(const SymbTable_ptr symb_table,
   case CAST_SIGNED:
   case CAST_UNSIGNED:
   case FLOOR:
+  case EXISTS_INIT:
     /* Ignores action */
   case EAX:
   case AAX:
@@ -1474,6 +1475,7 @@ formulaGetConstantsRecur(const SymbTable_ptr symb_table,
   case UMINUS:
   case EX:    /* CTL unary Temporal Operators */
   case SMALLINIT:  /* used for init(expr) */
+  case EXISTS_INIT:
   case AX:
   case EF:
   case AF:

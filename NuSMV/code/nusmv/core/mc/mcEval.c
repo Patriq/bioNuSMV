@@ -196,6 +196,7 @@ static bdd_ptr eval_ctl_spec_recur(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr n,
   case IMPLIES: return(binary_bdd_op(fsm, enc, bdd_or, n, 1, -1, 1, context));
   case IFF:     return(binary_bdd_op(fsm, enc, bdd_xor, n, -1, 1, 1, context));
 
+  case EXISTS_INIT: return(eval_ctl_spec(fsm, enc, car(n), context));
   case EX:      return(unary_mod_bdd_op(fsm, enc, ex, n,  1,  1, context));
   case AX:      return(unary_mod_bdd_op(fsm, enc, ex, n, -1, -1, context));
   case EF:      return(unary_mod_bdd_op(fsm, enc, ef, n,  1,  1, context));

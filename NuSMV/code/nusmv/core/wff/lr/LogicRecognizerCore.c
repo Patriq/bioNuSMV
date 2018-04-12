@@ -180,6 +180,7 @@ LogicType logic_recognizer_core_recognize(LogicRecognizerBase_ptr self,
     retval = EXP_NEXT; break;
 
     /* CTL */
+  case EXISTS_INIT:
   case EX: case AX: case EF: case AF: case EG: case AG:
   case ABU: case EBU:
   case EBF: case ABF: case EBG: case ABG:
