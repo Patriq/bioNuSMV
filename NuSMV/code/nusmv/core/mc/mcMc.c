@@ -107,12 +107,16 @@ void Mc_CheckCTLSpec(NuSMVEnv_ptr env, Prop_ptr prop)
     OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   const NodeMgr_ptr nodemgr =
     NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
-  boolean for_all_init;
-  
+  /* Check for ctlei flag or if the EXISTS_INIT symbol exists */
+  boolean for_all_init = opt_ctl_for_all_init(opts) && !search_node_type_in_children(spec, EXISTS_INIT);
+
   if (opt_verbose_level_gt(opts, 0)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
     Logger_log(logger, "evaluating ");
     print_spec(Logger_get_ostream(logger), prop, get_prop_print_method(opts));
+    if (!for_all_init) {
+      Logger_log(logger, "with flag -ctlei or with EXISTS_INIT.");
+    }
     Logger_log(logger, "\n");
   }
 
@@ -127,9 +131,6 @@ void Mc_CheckCTLSpec(NuSMVEnv_ptr env, Prop_ptr prop)
   if(get_print_accepting(opts) != NULL)
     accepted = bdd_dup(s0);
 
-  /* Check for ctlei flag or if the EXISTS_INIT symbol exists */
-  // Search for the EXISTS_INIT symbol
-  for_all_init = opt_ctl_for_all_init(opts) || !search_node_type_in_children(spec, EXISTS_INIT);
   if (!for_all_init) {
     bdd_ptr fs = BddFsm_get_fair_states(fsm);
     bdd_ptr is = BddFsm_get_init(fsm);

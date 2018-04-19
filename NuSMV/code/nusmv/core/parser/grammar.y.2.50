@@ -714,14 +714,13 @@ invarspec     : TOK_INVARSPEC _invarspec {$$ = new_lined_node(NODEMGR, INVARSPEC
 
 _ctlspec      : ctl_expression optsemi { $$ = $1; }
               | ctl_expression TOK_INCONTEXT context optsemi {$$ = new_node(NODEMGR, CONTEXT, $3, $1);}
-              | TOK_EXISTS_INIT ctl_expression optsemi { $$ = new_lined_node(NODEMGR, EXISTS_INIT, $2, Nil, $1); }
-              | TOK_EXISTS_INIT ctl_expression TOK_INCONTEXT context optsemi
-                                     {$$ = new_lined_node(NODEMGR, EXISTS_INIT, new_node(NODEMGR, CONTEXT, $4, $2), Nil, $1);}
 ;
 ctlspec       : TOK_SPEC _ctlspec {$$ = new_lined_node(NODEMGR, SPEC, $2, Nil, $1);}
               | TOK_CTLSPEC _ctlspec {$$ = new_lined_node(NODEMGR, SPEC, $2, Nil, $1);}
               | TOK_SPEC TOK_NAME var_id TOK_EQDEF  _ctlspec {$$ = new_lined_node(NODEMGR, SPEC, $5, $3, $1);}
               | TOK_CTLSPEC TOK_NAME var_id TOK_EQDEF _ctlspec {$$ = new_lined_node(NODEMGR, SPEC, $5, $3, $1);}
+              | TOK_SPEC_E _ctlspec {$$ = new_lined_node(NODEMGR, SPEC, new_node(NODEMGR, EXISTS_INIT, $2, Nil), Nil, $1);}
+              | TOK_SPEC_E TOK_NAME var_id TOK_EQDEF  _ctlspec {$$ = new_lined_node(NODEMGR, SPEC, new_node(NODEMGR, EXISTS_INIT, $5, Nil), $3, $1);}
 ;
 
 _ltlspec      : ltl_expression optsemi { $$ = $1; }

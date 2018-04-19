@@ -12,6 +12,7 @@
 "TRANS"                 {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_TRANS);}
 "INVAR"                 {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_INVAR);}
 "SPEC"                  {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_SPEC);}
+"SPEC_E"                {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_SPEC_E);}
 "CTLSPEC"               {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_CTLSPEC);}
 "LTLSPEC"               {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_LTLSPEC);}
 "PSLSPEC"               {nusmv_yylval.lineno = nusmv_yylineno; Parser_switch_to_psl(); return(TOK_PSLSPEC);}
@@ -57,7 +58,6 @@
 "READ"                  {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_WAREAD);}
 "WRITE"                 {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_WAWRITE);}
 
-"EXISTSINIT"            {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_EXISTS_INIT);}
 "EX"                    {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_EX);}
 "AX"                    {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_AX);}
 "EAX"                   {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_EAX);}

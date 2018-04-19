@@ -464,7 +464,7 @@ int printer_wff_core_print_node(PrinterBase_ptr self, node_ptr n, int priority)
     op = "&"; pr_tmp = 6; arity = 1; priority = 7;
     break;
 
-  case EXISTS_INIT: op = "EXISTS_INIT "; pr_tmp = 8; arity = 0; break;
+  case EXISTS_INIT: op = "EXISTS_INIT"; pr_tmp = 8; arity = 0; break;
   case EX: op = "EX "; pr_tmp = 8; arity = 0; break;
   case AX: op = "AX "; pr_tmp = 8; arity = 0; break;
   case EF: op = "EF "; pr_tmp = 8; arity = 0; break;
