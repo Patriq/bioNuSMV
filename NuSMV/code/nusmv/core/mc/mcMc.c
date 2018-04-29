@@ -107,8 +107,14 @@ void Mc_CheckCTLSpec(NuSMVEnv_ptr env, Prop_ptr prop)
     OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   const NodeMgr_ptr nodemgr =
     NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+
   /* Check for ctlei flag or if the EXISTS_INIT symbol exists */
-  boolean for_all_init = opt_ctl_for_all_init(opts) && !search_node_type_in_children(spec, EXISTS_INIT);
+  /* We chech the right side of the spec, because somehow the spec starts with node with type CONTEXT,
+     which in the left stores the context of the spec, and on the right the actual expression.
+
+     Also! Somehow the CONTEXT comes before the EXISTS_INIT although it was defined the other way around in the grammar
+     The program probably switches them around so it makes more sense for the context to come before the actual expression? */
+  boolean for_all_init = opt_ctl_for_all_init(opts) && cdr(spec)->type != EXISTS_INIT;
 
   if (opt_verbose_level_gt(opts, 0)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));

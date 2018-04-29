@@ -83,24 +83,6 @@ void node_set_type (node_ptr x, int type)
   x->type = type;
 }
 
-boolean search_node_type_in_children(node_ptr node, int type) {
-  node_ptr left;
-  node_ptr right;
-  if (node == Nil || node_get_type(node) <= NUSMV_CORE_SYMBOL_FIRST || node_get_type(node) >= NUSMV_CORE_SYMBOL_LAST) {
-    return false;
-  }
-  left = car(node);
-  if (left != Nil && node_get_type(left) == type) {
-    return true;
-  }
-  right = cdr(node);
-  if (right != Nil && node_get_type(right) == type) {
-    return true;
-  }
-  return search_node_type_in_children(left, type)
-         || search_node_type_in_children(right, type);
-}
-
 int node_is_failure(node_ptr x)
 {
   nusmv_assert(NULL != x);
