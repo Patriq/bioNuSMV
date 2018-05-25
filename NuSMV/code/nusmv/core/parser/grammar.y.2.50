@@ -269,7 +269,32 @@ action_expr	 : TOK_LP simple_expression TOK_RP { $$ = $2; };
 
 ctl_expr     : relational_expr
              | pure_ctl_expr /* all CTL operators */
+             | recursive_ctl_expr /* all recursive CTL expressions */
              ;
+
+recursive_ctl_expr
+             : TOK_EX TOK_LP ctl_expr TOK_COMMA { recursive_symbol_context = EX; } recursive TOK_RP
+                    { $$ = new_lined_node(NODEMGR, recursive_symbol_context, new_node(NODEMGR, AND, $3, new_node(NODEMGR, recursive_symbol_context, $6, Nil)), Nil, $1); }
+             | TOK_AX TOK_LP ctl_expr TOK_COMMA { recursive_symbol_context = AX; } recursive TOK_RP
+                    { $$ = new_lined_node(NODEMGR, recursive_symbol_context, new_node(NODEMGR, AND, $3, new_node(NODEMGR, recursive_symbol_context, $6, Nil)), Nil, $1); }
+             | TOK_EAX action_expr TOK_LP ctl_expr TOK_COMMA { recursive_symbol_context = EX; } recursive TOK_RP
+                    { $$ = new_lined_node(NODEMGR, EAX, new_node(NODEMGR, AND, $4, new_node(NODEMGR, recursive_symbol_context, $7, Nil)), $2, $1); }
+             | TOK_AAX action_expr TOK_LP ctl_expr TOK_COMMA { recursive_symbol_context = AX; } recursive TOK_RP
+                    { $$ = new_lined_node(NODEMGR, AAX, new_node(NODEMGR, AND, $4, new_node(NODEMGR, recursive_symbol_context, $7, Nil)), $2, $1); }
+             | TOK_EF TOK_LP ctl_expr TOK_COMMA { recursive_symbol_context = EF; } recursive TOK_RP
+                    { $$ = new_lined_node(NODEMGR, recursive_symbol_context, new_node(NODEMGR, AND, $3, new_node(NODEMGR, recursive_symbol_context, $6, Nil)), Nil, $1); }
+             | TOK_AF TOK_LP ctl_expr TOK_COMMA { recursive_symbol_context = AF; } recursive TOK_RP
+                    { $$ = new_lined_node(NODEMGR, recursive_symbol_context, new_node(NODEMGR, AND, $3, new_node(NODEMGR, recursive_symbol_context, $6, Nil)), Nil, $1); }
+             | TOK_EG TOK_LP ctl_expr TOK_COMMA { recursive_symbol_context = EG; } recursive TOK_RP
+                    { $$ = new_lined_node(NODEMGR, recursive_symbol_context, new_node(NODEMGR, AND, $3, new_node(NODEMGR, recursive_symbol_context, $6, Nil)), Nil, $1); }
+             | TOK_AG TOK_LP ctl_expr TOK_COMMA { recursive_symbol_context = AG; } recursive TOK_RP
+                    { $$ = new_lined_node(NODEMGR, recursive_symbol_context, new_node(NODEMGR, AND, $3, new_node(NODEMGR, recursive_symbol_context, $6, Nil)), Nil, $1); }
+             | TOK_NOT recursive_ctl_expr { $$ = new_lined_node(NODEMGR, NOT, $2, Nil, $1); }
+             ;
+
+/* recursive operator */
+recursive : ctl_expr TOK_COMMA recursive { $$ = new_node(NODEMGR, AND, $1, new_node(NODEMGR, recursive_symbol_context, $3, Nil)); } | ctl_expr { $$ = $1; };
+
 /* pure ctl_expr is introduced to allow NOT before the ctl expressions */
 pure_ctl_expr
              : TOK_EX ctl_expr       { $$ = new_lined_node(NODEMGR, EX, $2, Nil, $1); }
@@ -300,6 +325,9 @@ pure_ctl_expr
              | TOK_ABF subrange ctl_expr { $$ = new_lined_node(NODEMGR, ABF, $3, $2, $1); }
              | TOK_EBG subrange ctl_expr { $$ = new_lined_node(NODEMGR, EBG, $3, $2, $1); }
              | TOK_ABG subrange ctl_expr { $$ = new_lined_node(NODEMGR, ABG, $3, $2, $1); }
+
+             | TOK_RS ctl_expr  { $$ = new_lined_node(NODEMGR, EF, new_lined_node(NODEMGR, AND, $2, new_lined_node(NODEMGR, AG, $2, Nil, $1), $1), Nil, $1); }
+             | TOK_RAS action_expr ctl_expr { $$ = new_lined_node(NODEMGR, EAF, new_lined_node(NODEMGR, AND, $3, new_lined_node(NODEMGR, AAG, $3, $2, $1), $1), $2, $1); }
 
              /* NOT is required here to allow such expr as "! EX a" */
              | TOK_NOT pure_ctl_expr { $$ = new_lined_node(NODEMGR, NOT, $2, Nil, $1); }

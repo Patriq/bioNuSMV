@@ -73,6 +73,8 @@
 "AAF"                   {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_AAF);}
 "EAG"                   {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_EAG);}
 "AAG"                   {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_AAG);}
+"RS"                    {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_RS);}
+"RAS"                   {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_RAS);}
 "F"                     {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_OP_FUTURE);}
 "O"                     {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_OP_ONCE);}
 "G"                     {nusmv_yylval.lineno = nusmv_yylineno; return(TOK_OP_GLOBAL);}

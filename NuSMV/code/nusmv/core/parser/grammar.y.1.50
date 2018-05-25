@@ -57,6 +57,9 @@
 
 node_ptr parsed_tree; /* the returned value of parsing */
 
+/* recursive context variables */
+int recursive_symbol_context = -1;
+
 /* TODO[AMa] Dirty hack. This var must be updated before all calls of the
    parser */
 NuSMVEnv_ptr __nusmv_parser_env__;
@@ -140,6 +143,7 @@ static node_ptr node2maincontext(node_ptr node);
 
 %left  <lineno> TOK_COMMA TOK_IMPLIES TOK_IFF TOK_OR TOK_XOR TOK_XNOR TOK_AND TOK_NOT TOK_QUESTIONMARK
 %left  <lineno> TOK_EX TOK_AX TOK_EAX TOK_AAX TOK_EF TOK_AF TOK_EG TOK_AG TOK_EAF TOK_AAF TOK_EAG TOK_AAG TOK_EE TOK_AA TOK_EEA TOK_AAA
+%left  <lineno> TOK_RS TOK_RAS
 %left  <lineno> TOK_SINCE TOK_UNTIL TOK_TRIGGERED TOK_RELEASES
 %left  <lineno> TOK_EBF TOK_EBG TOK_ABF TOK_ABG TOK_BUNTIL TOK_MMIN TOK_MMAX
 %left  <lineno> TOK_OP_NEXT TOK_OP_GLOBAL TOK_OP_FUTURE
@@ -163,6 +167,7 @@ static node_ptr node2maincontext(node_ptr node);
 %type <node> additive_expr shift_expr
 %type <node> set_expr set_list_expr union_expr in_expr relational_expr 
 %type <node> ctl_expr pure_ctl_expr ctl_and_expr
+%type <node> recursive_ctl_expr recursive recursive_action
 %type <node> ctl_or_expr ctl_iff_expr ctl_implies_expr ctl_basic_expr
 %type <node> ltl_binary_expr ltl_unary_expr pure_ltl_unary_expr
 %type <node> and_expr or_expr iff_expr implies_expr basic_expr ite_expr
