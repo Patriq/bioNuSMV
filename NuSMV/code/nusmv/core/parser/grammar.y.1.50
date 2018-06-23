@@ -59,6 +59,7 @@ node_ptr parsed_tree; /* the returned value of parsing */
 
 /* recursive context variables */
 int recursive_symbol_context = -1;
+node_ptr recursive_action_context = NULL;
 
 /* TODO[AMa] Dirty hack. This var must be updated before all calls of the
    parser */
@@ -167,7 +168,7 @@ static node_ptr node2maincontext(node_ptr node);
 %type <node> additive_expr shift_expr
 %type <node> set_expr set_list_expr union_expr in_expr relational_expr 
 %type <node> ctl_expr pure_ctl_expr ctl_and_expr
-%type <node> recursive_ctl_expr recursive
+%type <node> recursive_ctl_expr recursive recursive_with_action
 %type <node> ctl_or_expr ctl_iff_expr ctl_implies_expr ctl_basic_expr
 %type <node> ltl_binary_expr ltl_unary_expr pure_ltl_unary_expr
 %type <node> and_expr or_expr iff_expr implies_expr basic_expr ite_expr

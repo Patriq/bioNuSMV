@@ -156,6 +156,9 @@ Each one of these operators is an alias to an already existing operators:
 * `RS(ctl_expression)` is an alias to `EF ( ctl_expression & AG ( ctl_expression ))`
 * `RAS(action)(ctl_expression)` is an alias to `EAF (action)( ctl_expression & AAG ( action )( ctl_expression ))`
 
-#### Recursive CTL operators
+#### Recursive CTL and ARCTL operators
 
-This syntax only works for all unary CTL operators, it aliases `OPERATOR(ctl_expresion_a, ctl_expresion_b, ..., ctl_expresion_z)` to `OPERATOR(ctl_expresion_a & ( OPERATOR ctl_expresion_b & ... & (OPERATOR ctl_expresion_z)))`
+This syntax only works for all CTL and ARCTL unary operators.
+
+Using CTL it aliases `OPERATOR(ctl_expresion_a, ctl_expresion_b, ..., ctl_expresion_z)` to `OPERATOR(ctl_expresion_a & ( OPERATOR ctl_expresion_b & ... & (OPERATOR ctl_expresion_z)))`
+Using ARCTL it aliases `EAX(action_expression)(ctl_expresion_a, ctl_expresion_b, ..., ctl_expresion_z) = EAX(action_expression)(ctl_expresion_a & EAX(action_expression)(ctl_expresion_b & ... &  EAX(action_expression)(ctl_expresion_z)))`
