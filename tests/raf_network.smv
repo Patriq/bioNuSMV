@@ -1,0 +1,43 @@
+-- created on 16. Mar. 2016 using PyBoolNet
+-- available at "sourceforge.net/projects/boolnetfixpoints".
+
+
+MODULE main
+
+VAR
+	Erk: boolean;
+	Mek: boolean;
+	Raf: boolean;
+
+DEFINE
+	Erk_IMAGE := Raf&Mek | Mek&Erk;
+	Mek_IMAGE := Raf&Mek | Erk;
+	Raf_IMAGE := !Raf | !Erk;
+
+	Erk_STEADY := (Erk_IMAGE = Erk);
+	Mek_STEADY := (Mek_IMAGE = Mek);
+	Raf_STEADY := (Raf_IMAGE = Raf);
+
+	SUCCESSORS := count((!Erk_STEADY), (!Mek_STEADY), (!Raf_STEADY));
+	STEADYSTATE := (SUCCESSORS = 0);
+
+ASSIGN
+	next(Erk) := {Erk, Erk_IMAGE};
+	next(Mek) := {Mek, Mek_IMAGE};
+	next(Raf) := {Raf, Raf_IMAGE};
+
+TRANS STEADYSTATE | count((next(Erk)!=Erk), (next(Mek)!=Mek), (next(Raf)!=Raf))=1;
+
+
+INIT TRUE
+
+
+CTLSPEC  EF(!Erk&!Mek&Raf) &  EF(Erk&Mek&Raf)
+-- erwarte: Erk&!Mek&Raf | Erk&!Mek&!Raf | !Erk&Mek&!Raf
+
+--CTLSPEC !EF(!Erk&!Mek&Raf) &  EF(Erk&Mek&Raf)
+-- erwarte: Erk&Mek&!Raf | Erk&Mek&Raf | !Erk&Mek&Raf
+
+--CTLSPEC  EF(!Erk&!Mek&Raf) & !EF(Erk&Mek&Raf)
+-- erwarte: !Erk&!Mek&!Raf | !Erk&!Mek&Raf
+

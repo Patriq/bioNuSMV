@@ -1,0 +1,22 @@
+-- File: latch.smv
+MODULE main
+    VAR output: boolean;
+    IVAR input: boolean;
+         clock: boolean;
+    ASSIGN
+        init(output) := 0;
+        next(output) := case
+            clock = 0 : output;
+            clock = 1 : input;
+        esac;
+
+-- Test
+SPEC EX(output=1)
+-- If clock and input, then output
+SPEC AG(!EAX(clock=1 & input=1)(!(output=1)))
+-- False: there is no way to have output=0 if clock & input
+SPEC EF(EAX(clock=1 & input=1)(output=0))
+-- If clock, then output (false, could be input=0)
+SPEC AG(!EAX(clock=1)(!(output=1)))
+-- This is true everywhere
+SPEC TRUE -> AAX(clock=1 & input=1)(output=1)
