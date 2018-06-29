@@ -1,6 +1,7 @@
 ### About bioNuSMV
-`bioNuSMV` is an extension of `NuSMV-a` which is an extension of `NuSMV 2.6.0` that adds a handful of features that aim to ease the model checking of bio systems.
-It was written by André Mendes as part of a software scolarship under the supervision of Pedro Monteiro at the Instituto Superior Técnico Taguspark.
+`bioNuSMV` is an extension of [`NuSMV-a`](https://github.com/hklarner/NuSMV-a), which is itself an extension of [`NuSMV 2.6.0`](https://nusmv.fbk.eu).
+It adds a handful of features which aim to ease the use of model checking in the analysis of qualitative regulatory networks, through a set of high level temporal operators over CTL.
+It was written by André Mendes ([Patriq](https://github.com/Patriq)) as part of a software scolarship under the supervision of Pedro T. Monteiro ([ptgm](https://github.com/ptgm)) at the [Instituto Superior Técnico (Taguspark campus)](https://tecnico.ulisboa.pt).
 
 ### Functionalities
 This version was a based on a couple a different versions of NuSMV out there, that already had most of the functionalities added here, but were either added to earlier NuSMV versions, or weren't public. The other functionalities were mostly sytax sugar aliases.
