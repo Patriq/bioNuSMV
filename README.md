@@ -1,7 +1,7 @@
 ### About bioNuSMV
-`bioNuSMV` is a fork and extension of [`NuSMV-a`](https://github.com/hklarner/NuSMV-a) by Hannes Klarner ([hklarner](https://github.com/hklarner)), which adds a handful of features to ease the use of model checking by biological modelers, in particular, in the context of the verification of qualitative regulatory networks.
+`bioNuSMV` is a fork and extension of [`NuSMV-a`](https://github.com/hklarner/NuSMV-a) by Hannes Klarner ([hklarner](https://github.com/hklarner)), which adds a handful of features to ease the use of model checking by modellers of biological processes, in particular, in the context of the verification of qualitative regulatory networks.
 
-It was implemented by André Mendes ([Patriq](https://github.com/Patriq) as part of the FCT funded research project ERGODiC, under the supervision of Pedro T. Monteiro ([ptgm](https://github.com/ptgm)) at [INESC-ID](http://www.inesc-id.pt)/[Instituto Superior Técnico (Taguspark campus)](https://tecnico.ulisboa.pt).
+It was implemented by André Mendes ([Patriq](https://github.com/Patriq)) as part of the FCT funded research project ERGODiC, under the supervision of Pedro T. Monteiro ([ptgm](https://github.com/ptgm)) at [INESC-ID](http://www.inesc-id.pt)/[Instituto Superior Técnico (Taguspark campus)](https://tecnico.ulisboa.pt).
 
 ### Features
 With respect to the original [`NuSMV 2.6.0`](https://nusmv.fbk.eu), this version adds the following features:
